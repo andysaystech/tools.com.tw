@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Andy百寶箱</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#eef8ef;--surface:#fff;--surface2:rgba(255,255,255,0.6);
+  --t1:#1C1C1E;--t2:#6E6E73;--t3:#C7C7CC;
+  --sep:rgba(60,60,67,0.12);
+  --blue:#007AFF;--radius:20px;
+  --tab-h:58px;
+}
+/* dark mode */
+[data-theme="dark"]{
+  --bg:#080818;--surface:#0e0e24;--surface2:rgba(14,14,36,0.7);
+  --t1:#fff;--t2:rgba(200,200,255,0.55);--t3:rgba(200,200,255,0.2);
+  --sep:rgba(100,100,255,0.15);--blue:#3d8eff;--radius:20px;
+}
+[data-theme="dark"] body{background:#080818}
+[data-theme="dark"] .app-tabs{background:rgba(44,44,46,0.96);border-bottom-color:rgba(255,255,255,0.10)}
+[data-theme="dark"] .app-tab.active{color:#3d8eff}
+[data-theme="dark"] .tool-card{
+  background:#0e0e24;border-color:rgba(100,100,255,0.18);
+  box-shadow:0 2px 20px rgba(60,60,200,.25);
+}
+[data-theme="dark"] .tool-card:hover{box-shadow:0 8px 32px rgba(60,80,255,.4)}
+html,body{min-height:100%;-webkit-font-smoothing:antialiased}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Noto Sans TC',sans-serif;
+  background:var(--bg);color:var(--t1);transition:background .3s,color .3s;
+}
+
+/* ─── TAB BAR ─── */
+.app-tabs{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  display:flex;height:var(--tab-h);align-items:center;
+  background:rgba(255,255,255,0.98);
+  backdrop-filter:saturate(180%) blur(40px);
+  -webkit-backdrop-filter:saturate(180%) blur(40px);
+  border-bottom:.5px solid var(--sep);
+}
+[data-theme="dark"] .app-tabs{background:rgba(44,44,46,0.96);border-bottom-color:rgba(255,255,255,0.10)}
+/* ─── NAV THEME DOTS ─── */
+.nav-theme{display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;flex-shrink:0}
+.nav-t-dot{width:17px;height:17px;border-radius:50%;cursor:pointer;transition:transform .2s,box-shadow .2s;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(128,128,128,0.25)}
+.nav-t-dot:hover{transform:scale(1.15)}
+.nav-t-dot.active{transform:scale(1.18);box-shadow:0 0 0 2.5px rgba(255,255,255,0.9),0 0 0 1.5px rgba(0,0,0,0.2)}
+.app-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-decoration:none;color:var(--t2);gap:2px;
+  font-size:.55rem;font-weight:500;letter-spacing:.01em;
+  transition:color .15s;-webkit-tap-highlight-color:transparent;
+  padding:4px 0;
+}
+.app-tab .ti{font-size:1.35rem;line-height:1.1}
+.app-tab.active{color:var(--blue)}
+.app-tab:active{opacity:.6}
+
+/* ─── CONTENT ─── */
+html,body{height:100%}
+.content{
+  padding-top:var(--tab-h);
+  min-height:100%;
+  display:flex;flex-direction:column;
+}
+
+/* ─── TOP BAR (hero + theme) ─── */
+.top-bar{
+  display:flex;align-items:center;justify-content:center;
+  padding:16px 20px 14px;flex-shrink:0;
+  text-align:center;
+}
+.hero-title{
+  font-size:clamp(1.3rem,4vw,2rem);font-weight:900;line-height:1.1;
+  letter-spacing:-.025em;color:var(--t1);
+}
+.hero-sub{font-size:clamp(.72rem,1.6vw,.88rem);color:var(--t2);margin-top:3px}
+
+/* ─── THEME TOGGLE ─── */
+.theme-toggle{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.t-dot{
+  width:26px;height:26px;border-radius:50%;cursor:pointer;
+  border:2.5px solid transparent;transition:all .25s;flex-shrink:0;
+}
+.t-dot.active{border-color:var(--t1);transform:scale(1.15)}
+.t-dot:hover{transform:scale(1.12)}
+.td-light{background:linear-gradient(135deg,#f8f8fa,#dcdce0)}
+.td-dark{background:linear-gradient(135deg,#0a0818,#1a1a48)}
+
+/* ─── TOOLS GRID ─── */
+.tools-grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:clamp(6px,1.5vw,14px);
+  padding:0 clamp(8px,2vw,16px) clamp(8px,2vw,16px);
+}
+@media(min-width:700px){.tools-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* ─── CARD ─── */
+.tool-card{
+  display:flex;flex-direction:column;align-items:center;
+  background:var(--surface);border-radius:var(--radius);
+  padding:clamp(14px,3.5vw,26px) clamp(12px,3vw,20px) clamp(16px,3.5vw,26px);
+  text-decoration:none;color:inherit;text-align:center;
+  box-shadow:0 2px 16px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.03);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;
+  -webkit-tap-highlight-color:transparent;
+  border:.5px solid var(--sep);
+  min-height:clamp(140px,24vw,260px);
+  position:relative;overflow:hidden;
+}
+.tool-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 14px 44px rgba(0,0,0,.13)}
+.tool-card:active{transform:scale(.96)}
+
+.card-icon-wrap{
+  width:clamp(40px,9vw,62px);height:clamp(40px,9vw,62px);
+  border-radius:clamp(10px,2.5vw,16px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(1.2rem,3.5vw,1.9rem);flex-shrink:0;
+  margin-bottom:clamp(8px,2.5vw,16px);
+  box-shadow:0 4px 12px rgba(0,0,0,.14);
+}
+.ci1{background:linear-gradient(145deg,#FF6CAB,#FF3C6F)}
+.ci2{background:linear-gradient(145deg,#47B4FF,#0A84FF)}
+.ci3{background:linear-gradient(145deg,#6FE0A6,#30D158)}
+.ci4{background:linear-gradient(145deg,#FFA060,#FF6B00)}
+.ci5{background:linear-gradient(145deg,#5AC8FA,#007AFF)}
+
+.card-body{flex:1;min-width:0}
+.card-title{font-size:clamp(.82rem,2.2vw,1.1rem);font-weight:700;letter-spacing:-.01em;margin-bottom:clamp(3px,0.8vw,7px)}
+.card-desc{font-size:clamp(.62rem,1.5vw,.8rem);color:var(--t2);line-height:1.55}
+
+.card-arrow{
+  position:absolute;bottom:clamp(10px,2vw,16px);right:clamp(12px,2.5vw,18px);
+  color:var(--t3);font-size:clamp(.9rem,2vw,1.2rem);transition:transform .2s;
+}
+.tool-card:hover .card-arrow{transform:translate(3px,-2px)}
+</style>
+</head>
+<body>
+
+<!-- TAB BAR -->
+<nav class="app-tabs">
+  <a href="index.html" class="app-tab active"><span class="ti">🏠</span><span>首頁</span></a>
+  <a href="lucky-draw.html" class="app-tab"><span class="ti">🎡</span><span>抽抽樂</span></a>
+  <a href="numbers.html" class="app-tab"><span class="ti">🎱</span><span>抽數字</span></a>
+  <a href="score-counter.html" class="app-tab"><span class="ti">🏆</span><span>計數</span></a>
+  <a href="pomodoro.html" class="app-tab"><span class="ti">🌱</span><span>時間</span></a>
+  <a href="currency.html" class="app-tab"><span class="ti">💱</span><span>匯率</span></a>
+  <a href="todo.html" class="app-tab"><span class="ti">✅</span><span>待辦</span></a>
+
+  <div class="nav-theme">
+    <div class="nav-t-dot td-light" onclick="setTheme('')" title="淺色"></div>
+    <div class="nav-t-dot td-dark" onclick="setTheme('dark')" title="深色"></div>
+  </div>
+</nav>
+
+<div class="content">
+  <div class="top-bar">
+    <div>
+      <div class="hero-title">Andy百寶箱</div>
+      <div class="hero-sub">選擇一個工具開始</div>
+    </div>
+  </div>
+
+  <div class="tools-grid">
+
+    <a class="tool-card" href="lucky-draw.html">
+      <div class="card-icon-wrap ci1">🎡</div>
+      <div class="card-body">
+        <div class="card-title">抽抽樂</div>
+        <div class="card-desc">幸運輪盤、抽籤筒</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="tool-card" href="numbers.html">
+      <div class="card-icon-wrap" style="background:linear-gradient(145deg,#a78bfa,#7c3aed)">🎱</div>
+      <div class="card-body">
+        <div class="card-title">抽數字</div>
+        <div class="card-desc">擲骰子、抽號碼球、撲克牌、老虎機</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="tool-card" href="score-counter.html">
+      <div class="card-icon-wrap ci2">🏆</div>
+      <div class="card-body">
+        <div class="card-title">計數</div>
+        <div class="card-desc">計分板、計數器</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="tool-card" href="pomodoro.html">
+      <div class="card-icon-wrap ci3">🌱</div>
+      <div class="card-body">
+        <div class="card-title">時間</div>
+        <div class="card-desc">時鐘、碼表、倒數、番茄鐘</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="tool-card" href="currency.html">
+      <div class="card-icon-wrap ci5">💱</div>
+      <div class="card-body">
+        <div class="card-title">匯率</div>
+        <div class="card-desc">即時匯率轉換，20 種主要貨幣</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="tool-card" href="todo.html">
+      <div class="card-icon-wrap" style="background:linear-gradient(145deg,#FF9A8B,#FF6B6B)">📋</div>
+      <div class="card-body">
+        <div class="card-title">待辦</div>
+        <div class="card-desc">艾森豪矩陣(重要緊急四象限)代辦清單</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+  </div>
+</div>
+
+<script>
+function setTheme(t){
+  const isDark=(t==='dark'||t==='neon'||t==='neumorphism');
+  const theme=isDark?'dark':'';
+  document.body.dataset.theme=theme;
+  document.querySelectorAll('.nav-t-dot').forEach(d=>d.classList.remove('active'));
+  const dot=document.querySelector(isDark?'.td-dark':'.td-light');
+  if(dot)dot.classList.add('active');
+  localStorage.setItem('app-theme',theme);
+}
+const saved=localStorage.getItem('app-theme')||'';
+setTheme(saved);
+</script>
+</body>
+</html>

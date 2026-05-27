@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>番茄鐘 &amp; 時鐘套件</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ── THEME VARIABLES ── */
+:root{
+  --tab-h:58px;
+  --bg:#0a1a10;
+  --nav-bg:rgba(44,44,46,0.96);
+  --nav-border:rgba(255,255,255,0.10);
+  --tab-inactive:rgba(255,255,255,0.38);
+  --card-bg:rgba(8,22,12,0.72);
+  --card-border:rgba(255,255,255,0.14);
+  --card-shadow1:rgba(0,0,0,.40);
+  --card-shadow2:rgba(0,0,0,.25);
+  --text:#ffffff;
+  --text2:rgba(255,255,255,.60);
+  --text3:rgba(255,255,255,.40);
+  --pill-bg:rgba(255,255,255,0.13);
+  --pill-c:rgba(255,255,255,0.70);
+  --ptab-bg:rgba(255,255,255,0.10);
+  --ptab-c:rgba(255,255,255,0.60);
+  --ring-bg:rgba(255,255,255,0.08);
+  --dot-border:rgba(255,255,255,.25);
+  --ctrl-bg:rgba(255,255,255,.10);
+  --ctrl-border:rgba(255,255,255,.15);
+  --sep:rgba(255,255,255,.08);
+  --lbl:rgba(255,255,255,.40);
+  --input-bg:rgba(255,255,255,.08);
+  --input-border:rgba(255,255,255,.14);
+  --wt-off-bg:rgba(255,255,255,.10);
+  --wt-off-c:rgba(255,255,255,.55);
+  --date-c:rgba(255,255,255,.50);
+  --arrow-c:rgba(255,255,255,.25);
+  --arrow-hover:rgba(255,255,255,.80);
+  --rst-bg:rgba(255,255,255,.12);
+  --rst-c:rgba(255,255,255,.80);
+  --rst-bd:rgba(255,255,255,.15);
+  --sw-lap-bg:rgba(255,255,255,.12);
+  --sw-lap-c:rgba(255,255,255,.80);
+  --sw-lap-bd:rgba(255,255,255,.15);
+  --sw-rst-bg:rgba(255,80,80,.15);
+  --sw-rst-c:rgba(255,150,150,1);
+  --sw-rst-bd:rgba(255,80,80,.20);
+  --laps-bg:rgba(255,255,255,.06);
+  --laps-bd:rgba(255,255,255,.10);
+  --lrow-bd:rgba(255,255,255,.06);
+  --lapn-c:rgba(255,255,255,.45);
+  --laps-c:rgba(255,255,255,.40);
+  --scroll-c:rgba(255,255,255,.20);
+  --active-ring:rgba(255,255,255,0.90);
+  --leaf-bg:#061428;
+}
+body.theme-light{
+  --bg:#eef8ef;
+  --nav-bg:rgba(255,255,255,0.98);
+  --nav-border:rgba(0,0,0,0.08);
+  --tab-inactive:rgba(20,55,28,0.45);
+  --card-bg:rgba(255,255,255,0.90);
+  --card-border:rgba(0,0,0,0.10);
+  --card-shadow1:rgba(0,0,0,.12);
+  --card-shadow2:rgba(0,0,0,.07);
+  --text:#0c1f10;
+  --text2:rgba(12,31,16,.68);
+  --text3:rgba(12,31,16,.45);
+  --pill-bg:rgba(0,0,0,0.07);
+  --pill-c:rgba(12,31,16,0.72);
+  --ptab-bg:rgba(0,0,0,0.07);
+  --ptab-c:rgba(12,31,16,0.62);
+  --ring-bg:rgba(0,0,0,0.08);
+  --dot-border:rgba(12,31,16,.22);
+  --ctrl-bg:rgba(0,0,0,.08);
+  --ctrl-border:rgba(0,0,0,.12);
+  --sep:rgba(0,0,0,.08);
+  --lbl:rgba(12,31,16,.50);
+  --input-bg:rgba(0,0,0,.06);
+  --input-border:rgba(0,0,0,.14);
+  --wt-off-bg:rgba(0,0,0,.08);
+  --wt-off-c:rgba(12,31,16,.58);
+  --date-c:rgba(12,31,16,.52);
+  --arrow-c:rgba(12,31,16,.32);
+  --arrow-hover:rgba(12,31,16,.82);
+  --rst-bg:rgba(0,0,0,.07);
+  --rst-c:rgba(12,31,16,.82);
+  --rst-bd:rgba(0,0,0,.12);
+  --sw-lap-bg:rgba(0,0,0,.07);
+  --sw-lap-c:rgba(12,31,16,.82);
+  --sw-lap-bd:rgba(0,0,0,.12);
+  --sw-rst-bg:rgba(180,30,30,.10);
+  --sw-rst-c:rgb(160,30,30);
+  --sw-rst-bd:rgba(180,30,30,.20);
+  --laps-bg:rgba(0,0,0,.04);
+  --laps-bd:rgba(0,0,0,.10);
+  --lrow-bd:rgba(0,0,0,.05);
+  --lapn-c:rgba(12,31,16,.42);
+  --laps-c:rgba(12,31,16,.38);
+  --scroll-c:rgba(0,0,0,.20);
+  --active-ring:rgba(12,31,16,0.85);
+  --leaf-bg:#c8e6f5;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Noto Sans TC',sans-serif;
+  background:var(--bg);color:var(--text);
+  transition:background .30s,color .30s;
+}
+
+/* TAB BAR */
+.app-tabs{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;height:var(--tab-h);align-items:center;
+  background:var(--nav-bg);backdrop-filter:saturate(180%) blur(40px);
+  -webkit-backdrop-filter:saturate(180%) blur(40px);
+  border-bottom:.5px solid var(--nav-border);transition:background .30s,border-color .30s}
+.app-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-decoration:none;color:var(--tab-inactive);gap:2px;font-size:.55rem;font-weight:500;
+  transition:color .15s;-webkit-tap-highlight-color:transparent}
+.app-tab .ti{font-size:1.35rem;line-height:1.1}
+.app-tab.active{color:#30D158}
+.app-tab:active{opacity:.6}
+
+/* NAV THEME DOTS */
+.nav-theme{display:flex;align-items:center;gap:8px;padding:0 14px 0 4px;flex-shrink:0}
+.nav-t-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(128,128,128,0.28)}
+.nav-t-dot:hover{transform:scale(1.15)}
+.nav-t-dot.active{transform:scale(1.20);
+  box-shadow:0 0 0 2.5px var(--active-ring),0 0 0 1px rgba(128,128,128,0.3)}
+.td-light{background:linear-gradient(135deg,#ffe082,#fff9c4,#ffffff)}
+.td-dark{background:linear-gradient(135deg,#1b4332,#0a1a10)}
+
+/* MODE PILLS — fixed, outside pomo-content, always on top */
+.mode-pills{
+  position:fixed;top:var(--tab-h);left:0;right:0;z-index:100;
+  display:flex;justify-content:center;padding:10px 16px 8px;gap:8px;flex-wrap:wrap}
+.mode-pill{
+  padding:9px 22px;border-radius:40px;border:1px solid rgba(255,255,255,.12);background:var(--pill-bg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  color:var(--pill-c);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:0.92rem;font-weight:500;line-height:1.35;
+  cursor:pointer;transition:all .3s;
+  display:inline-flex;align-items:center;justify-content:center;
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;
+}
+.mode-pill.active{
+  background:linear-gradient(135deg,#30D158,#1e9e40);
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 18px rgba(48,209,88,.45);transform:translateY(-1px);
+}
+.mode-pill:active{transform:scale(.93)}
+body.theme-light .mode-pill{border-color:rgba(0,80,20,0.18)}
+body.theme-light .pomo-tab{border-color:rgba(0,80,20,0.18)}
+
+/* CONTENT LAYER */
+.pomo-content{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;
+  display:flex;flex-direction:column;
+  padding-top:calc(var(--tab-h) + 62px)}
+
+/* MAIN VIEWS */
+#pomodoroView,#clockView,#countdownView,#stopwatchView{
+  flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 20px 16px;overflow:hidden}
+
+/* GLASS CARD */
+.glass-card{
+  background:var(--card-bg);
+  backdrop-filter:blur(48px) saturate(160%);-webkit-backdrop-filter:blur(48px) saturate(160%);
+  border:1px solid var(--card-border);border-radius:28px;padding:26px 30px;
+  box-shadow:0 24px 64px var(--card-shadow1),0 4px 16px var(--card-shadow2);
+  width:100%;max-width:380px;transition:background .30s,border-color .30s}
+
+/* PHASE TABS */
+.pomo-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.pomo-tab{
+  padding:9px 22px;border-radius:40px;
+  border:1px solid rgba(255,255,255,.12);background:var(--ptab-bg);
+  color:var(--ptab-c);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:0.92rem;font-weight:500;line-height:1.35;
+  cursor:pointer;transition:all .3s;
+  display:inline-flex;align-items:center;justify-content:center;
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;
+}
+.pomo-tab.active{
+  background:linear-gradient(135deg,#30D158,#1e9e40);
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 16px rgba(48,209,88,.40);
+  transform:translateY(-1px);
+}
+
+/* RING TIMER */
+.ring-wrap{position:relative;width:clamp(220px,55vw,280px);height:clamp(220px,55vw,280px);margin:0 auto 14px}
+.ring-svg{transform:rotate(-90deg);width:100%;height:100%}
+.ring-bg{fill:none;stroke:var(--ring-bg);stroke-width:10}
+.ring-prog{fill:none;stroke-width:10;stroke-linecap:round;stroke:url(#rg);transition:stroke-dashoffset 1s linear}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.timer-num{font-size:clamp(2.6rem,9vw,3.6rem);font-weight:900;font-family:'Inter',sans-serif;letter-spacing:-2px;line-height:1;color:var(--text)}
+.timer-lbl{font-size:.78rem;color:var(--text2);font-weight:500}
+.timer-sess{font-size:.7rem;color:var(--text3)}
+
+/* DOTS */
+.pomo-dots{display:flex;gap:7px;justify-content:center;margin-bottom:14px}
+.p-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--dot-border);transition:all .4s}
+.p-dot.done{background:#30D158;border-color:transparent;box-shadow:0 0 8px rgba(48,209,88,.60)}
+.p-dot.current{border-color:#30D158;animation:dotPulse 1.2s ease infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(48,209,88,.4)}50%{box-shadow:0 0 0 6px rgba(48,209,88,0)}}
+
+/* CONTROLS */
+.ctrl-row{display:flex;gap:14px;align-items:center;justify-content:center;margin-bottom:14px}
+.ctrl-btn{width:50px;height:50px;border-radius:50%;border:1px solid var(--ctrl-border);
+  background:var(--ctrl-bg);color:var(--text);font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.ctrl-btn:hover{background:var(--pill-bg)}
+.ctrl-btn:active{transform:scale(.88)}
+.ctrl-main{width:66px;height:66px;font-size:1.6rem;background:#30D158;border:none;
+  color:#fff!important;box-shadow:0 6px 24px rgba(48,209,88,.45)}
+.ctrl-main:hover{background:#3de06a}
+
+/* SETTINGS */
+.pomo-settings{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  padding-top:12px;border-top:1px solid var(--sep)}
+.pomo-set{display:flex;flex-direction:column;align-items:center;gap:3px}
+.pomo-set label{font-size:.68rem;color:var(--lbl)}
+.pomo-set input{width:62px;padding:6px;border-radius:10px;border:1px solid var(--input-border);cursor:ns-resize;touch-action:none;
+  background:var(--input-bg);color:var(--text);text-align:center;
+  font-size:.95rem;font-family:'Inter',sans-serif;font-weight:700;outline:none}
+
+/* CLOCK VIEW */
+#clockView{gap:4px;justify-content:flex-start!important;padding-top:0!important}
+.wt-header{display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;padding:0 16px}
+.wt-city{font-size:clamp(1rem,3.5vw,1.6rem);font-weight:700;color:var(--text)}
+.wt-offset{font-size:clamp(.66rem,1.8vw,.8rem);color:var(--wt-off-c);
+  background:var(--wt-off-bg);padding:3px 10px;border-radius:20px}
+.clock-big{
+  font-family:'Inter',sans-serif;font-size:clamp(2rem,9.5vw,5.5rem);font-weight:900;
+  letter-spacing:-2px;line-height:1;display:inline-block;flex-shrink:0;
+  color:#30D158}
+body.theme-light .clock-big{color:#1a7d3a}
+.clock-date{font-size:clamp(.7rem,2vw,.9rem);color:var(--date-c);font-weight:500;letter-spacing:.5px;flex-shrink:0}
+.world-map-canvas{flex:1;min-height:0;width:100%;display:block;
+  align-self:stretch;margin-top:6px;border-radius:0;overflow:hidden}
+
+/* Leaflet */
+.leaflet-container{background:var(--leaf-bg)!important;font-family:inherit}
+.leaflet-control-zoom a{background:rgba(8,22,12,.9)!important;color:#fff!important;border-color:rgba(255,255,255,.15)!important}
+body.theme-light .leaflet-control-zoom a{background:rgba(255,255,255,.92)!important;color:#0c1f10!important;border-color:rgba(0,0,0,.15)!important}
+.leaflet-control-zoom a:hover{background:rgba(48,209,88,.25)!important;color:#30D158!important}
+.leaflet-control-attribution{display:none!important}
+.city-label-sel{
+  background:rgba(220,30,30,.92)!important;border:none!important;
+  color:#fff!important;font-weight:700!important;font-size:11.5px!important;
+  padding:3px 9px!important;border-radius:12px!important;
+  box-shadow:0 0 16px rgba(220,30,30,.55),0 2px 8px rgba(0,0,0,.5)!important;
+  white-space:nowrap!important;pointer-events:none!important}
+.city-label-sel::before{border-right-color:rgba(220,30,30,.92)!important}
+.city-label-sel.leaflet-tooltip-left::before{border-left-color:rgba(220,30,30,.92)!important}
+/* dark mode hover tooltip */
+.city-label-hover{
+  background:rgba(255,255,255,.92)!important;border:1px solid rgba(255,255,255,.5)!important;
+  color:rgba(10,10,10,.9)!important;font-size:11px!important;font-weight:600!important;
+  padding:2px 8px!important;border-radius:8px!important;
+  box-shadow:0 2px 12px rgba(0,0,0,.5)!important;pointer-events:none!important}
+body.theme-light .city-label-hover{
+  background:rgba(220,30,30,.90)!important;color:#fff!important;
+  border-color:rgba(180,0,0,.4)!important}
+.city-label-hover::before{border-right-color:rgba(255,255,255,.92)!important}
+.city-label-hover.leaflet-tooltip-left::before{border-left-color:rgba(255,255,255,.92)!important}
+body.theme-light .city-label-hover::before{border-right-color:rgba(220,30,30,.90)!important}
+body.theme-light .city-label-hover.leaflet-tooltip-left::before{border-left-color:rgba(220,30,30,.90)!important}
+
+/* COUNTDOWN VIEW */
+#countdownView{gap:clamp(10px,3vh,24px)}
+.cd-main{display:flex;align-items:center;gap:2px}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:0;cursor:ns-resize;user-select:none;touch-action:none}
+.cd-num{
+  font-family:'Inter',sans-serif;
+  font-size:clamp(3.5rem,16vw,10rem);font-weight:900;letter-spacing:-3px;line-height:1;
+  background:linear-gradient(135deg,#FA709A,#FEE140);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:inline-block;min-width:2.1ch;text-align:center}
+body.theme-light .cd-num{
+  background:linear-gradient(135deg,#b81550,#9a6200);
+  -webkit-background-clip:text;background-clip:text}
+.cd-colon{
+  font-size:clamp(3rem,14vw,9rem);font-weight:900;line-height:1;
+  background:linear-gradient(135deg,#FA709A,#FEE140);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:inline-block;align-self:center;padding-bottom:.35em}
+body.theme-light .cd-colon{
+  background:linear-gradient(135deg,#b81550,#9a6200);
+  -webkit-background-clip:text;background-clip:text}
+.cd-arrow{
+  background:none;border:none;color:var(--arrow-c);
+  font-size:clamp(.78rem,2vw,1rem);cursor:pointer;padding:5px 14px;
+  line-height:1;transition:color .15s,transform .1s}
+.cd-arrow:hover{color:var(--arrow-hover);transform:scale(1.25)}
+.cd-arrow:active{transform:scale(.88)}
+.cd-running .cd-arrow{opacity:0;pointer-events:none}
+.cd-done{
+  font-size:clamp(2rem,8vw,4rem);font-weight:800;
+  background:linear-gradient(135deg,#30D158,#38f9d7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:inline-block;animation:pulseCD .5s ease infinite alternate}
+@keyframes pulseCD{from{opacity:1}to{opacity:.5}}
+
+/* ── OVERTIME ── */
+.cd-overtime-wrap{
+  display:none;flex-direction:column;align-items:center;gap:10px;
+}
+.cd-ot-badge{
+  background:linear-gradient(135deg,#FF453A,#FF9500);
+  color:#fff;padding:5px 18px;border-radius:20px;
+  font-size:.82rem;font-weight:800;letter-spacing:.05em;
+  box-shadow:0 0 18px rgba(255,69,58,.55);
+  animation:otBadgeFloat 1.4s ease-in-out infinite;
+}
+@keyframes otBadgeFloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-5px) scale(1.04)}
+}
+.cd-overtime-wrap .cd-main{
+  animation:otNumFloat 1.8s ease-in-out infinite;
+}
+@keyframes otNumFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.cd-overtime-wrap .cd-num{
+  background:linear-gradient(135deg,#FF453A 0%,#FF9500 100%) !important;
+  -webkit-background-clip:text !important;background-clip:text !important;
+  -webkit-text-fill-color:transparent;
+  animation:otNumPulse .75s ease infinite alternate;
+}
+.cd-overtime-wrap .cd-colon{
+  background:linear-gradient(135deg,#FF453A,#FF9500) !important;
+  -webkit-background-clip:text !important;background-clip:text !important;
+  -webkit-text-fill-color:transparent;
+}
+@keyframes otNumPulse{
+  from{opacity:1;filter:brightness(1.25)}
+  to{opacity:.55;filter:brightness(.85)}
+}
+body.theme-light .cd-overtime-wrap .cd-num{
+  background:linear-gradient(135deg,#d41010,#c45000) !important;
+  -webkit-background-clip:text !important;background-clip:text !important;
+}
+body.theme-light .cd-overtime-wrap .cd-colon{
+  background:linear-gradient(135deg,#d41010,#c45000) !important;
+  -webkit-background-clip:text !important;background-clip:text !important;
+}
+.cd-btns{display:flex;gap:12px}
+.cd-btn{padding:12px 30px;border-radius:30px;border:none;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .25s}
+.cd-btn.go{background:linear-gradient(135deg,#FA709A,#FEE140);color:#fff;box-shadow:0 4px 20px rgba(250,112,154,.45)}
+.cd-btn.go:hover{transform:translateY(-2px)}
+.cd-btn.go:active{transform:scale(.93)}
+.cd-btn.rst{background:var(--rst-bg);color:var(--rst-c);border:1px solid var(--rst-bd)}
+
+/* STOPWATCH VIEW */
+#stopwatchView{gap:20px}
+.sw-display{
+  font-family:'Inter',sans-serif;font-size:clamp(3.5rem,16vw,10rem);
+  font-weight:900;letter-spacing:-3px;white-space:nowrap;display:flex;align-items:baseline}
+#swDisplay{
+  display:inline-block;
+  background:linear-gradient(135deg,#A18CD1,#FBC2EB,#F5576C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.theme-light #swDisplay{
+  background:linear-gradient(135deg,#5a2d9a,#9a2070,#b80a22);
+  -webkit-background-clip:text;background-clip:text}
+.sw-ms{
+  display:inline-block;font-size:.5em;opacity:.65;
+  background:linear-gradient(135deg,#D4B8F5,#FBC2EB,#F5576C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.theme-light .sw-ms{
+  background:linear-gradient(135deg,#6a3db5,#9a2070,#b80a22);
+  -webkit-background-clip:text;background-clip:text}
+.sw-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sw-btn{padding:11px 24px;border-radius:30px;border:none;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .25s}
+.sw-btn.go{background:linear-gradient(135deg,#A18CD1,#FBC2EB);color:#fff;box-shadow:0 4px 20px rgba(161,140,209,.40)}
+.sw-btn.go:hover{transform:translateY(-2px)}
+.sw-btn.go:active{transform:scale(.93)}
+.sw-btn.lap{background:var(--sw-lap-bg);color:var(--sw-lap-c);border:1px solid var(--sw-lap-bd)}
+.sw-btn.rst{background:var(--sw-rst-bg);color:var(--sw-rst-c);border:1px solid var(--sw-rst-bd)}
+.laps-wrap{width:100%;max-width:400px;max-height:180px;overflow-y:auto;
+  background:var(--laps-bg);border-radius:16px;border:1px solid var(--laps-bd)}
+.laps-wrap::-webkit-scrollbar{width:3px}
+.laps-wrap::-webkit-scrollbar-thumb{background:var(--scroll-c);border-radius:2px}
+.lap-row{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;
+  border-bottom:.5px solid var(--lrow-bd);font-size:.82rem;color:var(--text)}
+.lap-row:last-child{border-bottom:none}
+.lap-n{color:var(--lapn-c);font-size:.72rem}
+.lap-t{font-family:'Inter',sans-serif;font-weight:600}
+.lap-s{color:var(--laps-c);font-size:.72rem}
+.lap-best{color:#30D158}.lap-worst{color:#FF453A}
+</style>
+</head>
+<body>
+
+<nav class="app-tabs">
+  <a href="index.html" class="app-tab"><span class="ti">🏠</span><span>首頁</span></a>
+  <a href="lucky-draw.html" class="app-tab"><span class="ti">🎡</span><span>抽抽樂</span></a>
+  <a href="numbers.html" class="app-tab"><span class="ti">🎱</span><span>抽數字</span></a>
+  <a href="score-counter.html" class="app-tab"><span class="ti">🏆</span><span>計數</span></a>
+  <a href="pomodoro.html" class="app-tab active"><span class="ti">🌱</span><span>時間</span></a>
+  <a href="currency.html" class="app-tab"><span class="ti">💱</span><span>匯率</span></a>
+  <a href="todo.html" class="app-tab"><span class="ti">✅</span><span>待辦</span></a>
+
+  <div class="nav-theme">
+    <div class="nav-t-dot td-light" onclick="setTheme('light')" title="☀️ 亮色"></div>
+    <div class="nav-t-dot td-dark"  onclick="setTheme('dark')"  title="🌙 暗色"></div>
+  </div>
+</nav>
+
+<div class="mode-pills">
+  <button class="mode-pill active" onclick="switchMode('clock')">🕐 時鐘</button>
+  <button class="mode-pill" onclick="switchMode('stopwatch')">⏱ 碼錶</button>
+  <button class="mode-pill" onclick="switchMode('countdown')">⏳ 倒數</button>
+  <button class="mode-pill" onclick="switchMode('pomodoro')">🍅 番茄鐘</button>
+</div>
+
+<div class="pomo-content">
+  <div id="pomodoroView" style="display:none">
+    <div class="glass-card">
+      <div class="pomo-tabs">
+        <button class="pomo-tab active" onclick="setPomoPhase('work')">🍅 工作</button>
+        <button class="pomo-tab" onclick="setPomoPhase('short')">☕ 短休</button>
+        <button class="pomo-tab" onclick="setPomoPhase('long')">🛌 長休</button>
+      </div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 220 220" width="220" height="220">
+          <defs>
+            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#30D158" id="rg1"/>
+              <stop offset="100%" stop-color="#38f9d7" id="rg2"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="110" cy="110" r="96"/>
+          <circle class="ring-prog" id="ringProg" cx="110" cy="110" r="96" stroke-dasharray="603.2" stroke-dashoffset="0"/>
+        </svg>
+        <div class="ring-center">
+          <div class="timer-num" id="pomoTime">25:00</div>
+          <div class="timer-lbl" id="pomoLabel">工作時間</div>
+          <div class="timer-sess" id="pomoSession">第 1 輪</div>
+        </div>
+      </div>
+      <div class="pomo-dots" id="pomoDots"></div>
+      <div class="ctrl-row">
+        <button class="ctrl-btn" onclick="resetPomo()">↺</button>
+        <button class="ctrl-btn ctrl-main" id="pomoPlayBtn" onclick="togglePomo()">▶</button>
+        <button class="ctrl-btn" onclick="skipPomoPhase()">⏭</button>
+      </div>
+      <div class="pomo-settings">
+        <div class="pomo-set"><label>工作(分)</label><input type="number" id="workMin" value="25" min="1" max="99" onchange="updatePomoTimes()"></div>
+        <div class="pomo-set"><label>短休(分)</label><input type="number" id="shortMin" value="5" min="1" max="60" onchange="updatePomoTimes()"></div>
+        <div class="pomo-set"><label>長休(分)</label><input type="number" id="longMin" value="15" min="1" max="99" onchange="updatePomoTimes()"></div>
+        <div class="pomo-set"><label>循環數</label><input type="number" id="cycleCount" value="4" min="1" max="12" onchange="updateCycles()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="clockView" style="display:none">
+    <div class="wt-header">
+      <span class="wt-city" id="wtdCity">台北</span>
+      <span class="wt-offset" id="wtdOffset">UTC+8</span>
+    </div>
+    <div class="clock-big" id="clockDisplay">00:00:00</div>
+    <div class="clock-date" id="clockDate"></div>
+    <div id="worldMapCanvas" class="world-map-canvas"></div>
+  </div>
+
+  <div id="countdownView" style="display:none">
+    <div class="cd-main" id="cdMain">
+      <div class="cd-unit">
+        <button class="cd-arrow" onclick="cdAdj('h',1)">▲</button>
+        <span class="cd-num" id="cdHDisp">00</span>
+        <button class="cd-arrow" onclick="cdAdj('h',-1)">▼</button>
+      </div>
+      <span class="cd-colon">:</span>
+      <div class="cd-unit">
+        <button class="cd-arrow" onclick="cdAdj('m',1)">▲</button>
+        <span class="cd-num" id="cdMDisp">05</span>
+        <button class="cd-arrow" onclick="cdAdj('m',-1)">▼</button>
+      </div>
+      <span class="cd-colon">:</span>
+      <div class="cd-unit">
+        <button class="cd-arrow" onclick="cdAdj('s',1)">▲</button>
+        <span class="cd-num" id="cdSDisp">00</span>
+        <button class="cd-arrow" onclick="cdAdj('s',-1)">▼</button>
+      </div>
+    </div>
+    <!-- Overtime display (shown immediately when countdown reaches 0) -->
+    <div class="cd-overtime-wrap" id="cdOvertimeWrap">
+      <div class="cd-ot-badge">⚠️ 超時進行中</div>
+      <div class="cd-main">
+        <div class="cd-unit"><span class="cd-num" id="cdOtH">00</span></div>
+        <span class="cd-colon">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cdOtM">00</span></div>
+        <span class="cd-colon">:</span>
+        <div class="cd-unit"><span class="cd-num" id="cdOtS">00</span></div>
+      </div>
+    </div>
+    <div class="cd-btns">
+      <button class="cd-btn go" onclick="toggleCountdown()">▶ 開始</button>
+      <button class="cd-btn rst" onclick="resetCountdown()">↺ 重置</button>
+    </div>
+  </div>
+
+  <div id="stopwatchView" style="display:none">
+    <div class="sw-display"><span id="swDisplay">00:00</span><span class="sw-ms" id="swMs">.00</span></div>
+    <div class="sw-btns">
+      <button class="sw-btn go" onclick="toggleSW()" id="swBtn">▶ 開始</button>
+      <button class="sw-btn lap" onclick="addLap()">🏁 計次</button>
+      <button class="sw-btn rst" onclick="resetSW()">↺ 重置</button>
+    </div>
+    <div class="laps-wrap"><div id="lapsList"></div></div>
+  </div>
+</div>
+
+<script>
+// ── THEME ──────────────────────────────────────────────────────────────────
+let _tileLayerRef = null;
+let _leafMap = null;
+let _leafMarkers = new Map();
+
+function setTheme(t) {
+  const isLight = (t !== 'dark');
+  document.body.classList.toggle('theme-light', isLight);
+  document.querySelectorAll('.nav-t-dot').forEach(d => d.classList.remove('active'));
+  const dot = document.querySelector(isLight ? '.td-light' : '.td-dark');
+  if (dot) dot.classList.add('active');
+  // store consistent with other pages: '' = light, 'dark' = dark
+  localStorage.setItem('app-theme', isLight ? '' : 'dark');
+  if (_leafMap && _tileLayerRef) {
+    _leafMap.removeLayer(_tileLayerRef);
+    const url = isLight
+      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    _tileLayerRef = L.tileLayer(url, { subdomains: 'abcd', maxZoom: 20 }).addTo(_leafMap);
+    // re-apply marker colours to match new theme
+    _applyMarkers();
+  }
+}
+
+(function () {
+  const saved = localStorage.getItem('app-theme');
+  // '' or null = light (consistent with other pages); 'dark' = dark
+  const isDark = (saved === 'dark' || saved === 'neon' || saved === 'neumorphism');
+  setTheme(isDark ? 'dark' : 'light');
+})();
+
+// ── MODE SWITCH ────────────────────────────────────────────────────────────
+const MODES = ['clock', 'stopwatch', 'countdown', 'pomodoro'];
+function switchMode(m, pushHash) {
+  if (pushHash !== false) location.hash = m;
+  document.querySelectorAll('.mode-pill').forEach((b, i) => b.classList.toggle('active', MODES[i] === m));
+  MODES.forEach(id => { document.getElementById(id + 'View').style.display = id === m ? 'flex' : 'none'; });
+  if (m === 'clock') startClock();
+}
+window.addEventListener('hashchange', function () {
+  const h = location.hash.replace('#', '');
+  if (MODES.includes(h)) switchMode(h, false);
+});
+
+// ── WORLD CLOCK ────────────────────────────────────────────────────────────
+const WORLD_CITIES = [
+  // ── 東亞 ──
+  { name: '台北',      tz: 'Asia/Taipei',                    lon: 121.5,  lat: 25.1  },
+  { name: '東京',      tz: 'Asia/Tokyo',                     lon: 139.7,  lat: 35.7  },
+  { name: '大阪',      tz: 'Asia/Tokyo',                     lon: 135.5,  lat: 34.7  },
+  { name: '那霸',      tz: 'Asia/Tokyo',                     lon: 127.7,  lat: 26.2  },
+  { name: '首爾',      tz: 'Asia/Seoul',                     lon: 126.9,  lat: 37.6  },
+  { name: '北京',      tz: 'Asia/Shanghai',                  lon: 116.4,  lat: 39.9  },
+  { name: '上海',      tz: 'Asia/Shanghai',                  lon: 121.5,  lat: 31.2  },
+  { name: '廣州',      tz: 'Asia/Shanghai',                  lon: 113.3,  lat: 23.1  },
+  { name: '成都',      tz: 'Asia/Shanghai',                  lon: 104.1,  lat: 30.7  },
+  { name: '香港',      tz: 'Asia/Hong_Kong',                 lon: 114.2,  lat: 22.3  },
+  { name: '澳門',      tz: 'Asia/Macau',                     lon: 113.5,  lat: 22.2  },
+  { name: '烏蘭巴托',  tz: 'Asia/Ulaanbaatar',              lon: 106.9,  lat: 47.9  },
+  // ── 東南亞 ──
+  { name: '新加坡',    tz: 'Asia/Singapore',                 lon: 103.8,  lat: 1.3   },
+  { name: '吉隆坡',    tz: 'Asia/Kuala_Lumpur',             lon: 101.7,  lat: 3.1   },
+  { name: '曼谷',      tz: 'Asia/Bangkok',                   lon: 100.5,  lat: 13.8  },
+  { name: '清邁',      tz: 'Asia/Bangkok',                   lon: 98.9,   lat: 18.8  },
+  { name: '河內',      tz: 'Asia/Bangkok',                   lon: 105.8,  lat: 21.0  },
+  { name: '胡志明市',  tz: 'Asia/Ho_Chi_Minh',              lon: 106.7,  lat: 10.8  },
+  { name: '仰光',      tz: 'Asia/Rangoon',                   lon: 96.2,   lat: 16.8  },
+  { name: '金邊',      tz: 'Asia/Phnom_Penh',               lon: 104.9,  lat: 11.6  },
+  { name: '萬象',      tz: 'Asia/Vientiane',                 lon: 102.6,  lat: 18.0  },
+  { name: '雅加達',    tz: 'Asia/Jakarta',                   lon: 106.8,  lat: -6.2  },
+  { name: '峇里島',    tz: 'Asia/Makassar',                  lon: 115.2,  lat: -8.7  },
+  { name: '馬尼拉',    tz: 'Asia/Manila',                    lon: 121.0,  lat: 14.6  },
+  { name: '宿霧',      tz: 'Asia/Manila',                    lon: 123.9,  lat: 10.3  },
+  { name: '班達斯里',  tz: 'Asia/Brunei',                    lon: 114.9,  lat: 4.9   },
+  { name: '帝力',      tz: 'Asia/Dili',                      lon: 125.6,  lat: -8.6  },
+  // ── 南亞 ──
+  { name: '德里',      tz: 'Asia/Kolkata',                   lon: 77.2,   lat: 28.6  },
+  { name: '孟買',      tz: 'Asia/Kolkata',                   lon: 72.9,   lat: 19.1  },
+  { name: '班加羅爾',  tz: 'Asia/Kolkata',                   lon: 77.6,   lat: 12.9  },
+  { name: '加爾各答',  tz: 'Asia/Kolkata',                   lon: 88.4,   lat: 22.6  },
+  { name: '清奈',      tz: 'Asia/Kolkata',                   lon: 80.3,   lat: 13.1  },
+  { name: '卡拉奇',    tz: 'Asia/Karachi',                   lon: 67.0,   lat: 24.9  },
+  { name: '伊斯蘭馬巴德',tz:'Asia/Karachi',                  lon: 73.0,   lat: 33.7  },
+  { name: '達卡',      tz: 'Asia/Dhaka',                     lon: 90.4,   lat: 23.8  },
+  { name: '科倫坡',    tz: 'Asia/Colombo',                   lon: 79.9,   lat: 6.9   },
+  { name: '加德滿都',  tz: 'Asia/Kathmandu',                 lon: 85.3,   lat: 27.7  },
+  { name: '廷布',      tz: 'Asia/Thimphu',                   lon: 89.6,   lat: 27.5  },
+  { name: '馬累',      tz: 'Indian/Maldives',                lon: 73.5,   lat: 4.2   },
+  // ── 中亞 ──
+  { name: '阿拉木圖',  tz: 'Asia/Almaty',                    lon: 76.9,   lat: 43.2  },
+  { name: '阿斯塔納',  tz: 'Asia/Almaty',                    lon: 71.4,   lat: 51.2  },
+  { name: '塔什干',    tz: 'Asia/Tashkent',                  lon: 69.3,   lat: 41.3  },
+  { name: '比什凱克',  tz: 'Asia/Bishkek',                   lon: 74.6,   lat: 42.9  },
+  { name: '杜尚別',    tz: 'Asia/Dushanbe',                  lon: 68.8,   lat: 38.6  },
+  { name: '阿什哈巴德',tz: 'Asia/Ashgabat',                  lon: 58.4,   lat: 37.9  },
+  { name: '喀布爾',    tz: 'Asia/Kabul',                     lon: 69.2,   lat: 34.5  },
+  // ── 西亞 / 中東 ──
+  { name: '德黑蘭',    tz: 'Asia/Tehran',                    lon: 51.4,   lat: 35.7  },
+  { name: '巴格達',    tz: 'Asia/Baghdad',                   lon: 44.4,   lat: 33.3  },
+  { name: '安曼',      tz: 'Asia/Amman',                     lon: 35.9,   lat: 31.9  },
+  { name: '貝魯特',    tz: 'Asia/Beirut',                    lon: 35.5,   lat: 33.9  },
+  { name: '大馬士革',  tz: 'Asia/Damascus',                  lon: 36.3,   lat: 33.5  },
+  { name: '耶路撒冷',  tz: 'Asia/Jerusalem',                 lon: 35.2,   lat: 31.8  },
+  { name: '利雅德',    tz: 'Asia/Riyadh',                    lon: 46.7,   lat: 24.7  },
+  { name: '科威特',    tz: 'Asia/Kuwait',                    lon: 47.9,   lat: 29.4  },
+  { name: '多哈',      tz: 'Asia/Qatar',                     lon: 51.5,   lat: 25.3  },
+  { name: '麥納麥',    tz: 'Asia/Bahrain',                   lon: 50.6,   lat: 26.2  },
+  { name: '杜拜',      tz: 'Asia/Dubai',                     lon: 55.3,   lat: 25.2  },
+  { name: '阿布達比',  tz: 'Asia/Dubai',                     lon: 54.4,   lat: 24.5  },
+  { name: '馬斯喀特',  tz: 'Asia/Muscat',                    lon: 58.6,   lat: 23.6  },
+  { name: '桑阿',      tz: 'Asia/Aden',                      lon: 44.2,   lat: 15.4  },
+  // ── 俄羅斯 ──
+  { name: '莫斯科',    tz: 'Europe/Moscow',                  lon: 37.6,   lat: 55.8  },
+  { name: '聖彼得堡',  tz: 'Europe/Moscow',                  lon: 30.3,   lat: 59.9  },
+  { name: '葉卡捷琳堡',tz: 'Asia/Yekaterinburg',             lon: 60.6,   lat: 56.8  },
+  { name: '新西伯利亞',tz: 'Asia/Novosibirsk',               lon: 82.9,   lat: 55.0  },
+  { name: '符拉迪沃斯托克',tz:'Asia/Vladivostok',            lon: 131.9,  lat: 43.1  },
+  // ── 歐洲西部 ──
+  { name: '倫敦',      tz: 'Europe/London',                  lon: -0.1,   lat: 51.5  },
+  { name: '都柏林',    tz: 'Europe/Dublin',                  lon: -6.3,   lat: 53.3  },
+  { name: '里斯本',    tz: 'Europe/Lisbon',                  lon: -9.1,   lat: 38.7  },
+  { name: '馬德里',    tz: 'Europe/Madrid',                  lon: -3.7,   lat: 40.4  },
+  { name: '巴塞隆納',  tz: 'Europe/Madrid',                  lon: 2.2,    lat: 41.4  },
+  { name: '巴黎',      tz: 'Europe/Paris',                   lon: 2.4,    lat: 48.9  },
+  { name: '阿姆斯特丹',tz: 'Europe/Amsterdam',               lon: 4.9,    lat: 52.4  },
+  { name: '布魯塞爾',  tz: 'Europe/Brussels',                lon: 4.4,    lat: 50.8  },
+  { name: '蘇黎世',    tz: 'Europe/Zurich',                  lon: 8.5,    lat: 47.4  },
+  { name: '雷克雅維克',tz: 'Atlantic/Reykjavik',             lon: -22.0,  lat: 64.1  },
+  // ── 歐洲中部 ──
+  { name: '柏林',      tz: 'Europe/Berlin',                  lon: 13.4,   lat: 52.5  },
+  { name: '慕尼黑',    tz: 'Europe/Berlin',                  lon: 11.6,   lat: 48.1  },
+  { name: '維也納',    tz: 'Europe/Vienna',                  lon: 16.4,   lat: 48.2  },
+  { name: '布拉格',    tz: 'Europe/Prague',                  lon: 14.5,   lat: 50.1  },
+  { name: '華沙',      tz: 'Europe/Warsaw',                  lon: 21.0,   lat: 52.2  },
+  { name: '布達佩斯',  tz: 'Europe/Budapest',                lon: 19.0,   lat: 47.5  },
+  // ── 歐洲北部 ──
+  { name: '斯德哥爾摩',tz: 'Europe/Stockholm',               lon: 18.1,   lat: 59.3  },
+  { name: '奧斯陸',    tz: 'Europe/Oslo',                    lon: 10.7,   lat: 59.9  },
+  { name: '哥本哈根',  tz: 'Europe/Copenhagen',              lon: 12.6,   lat: 55.7  },
+  { name: '赫爾辛基',  tz: 'Europe/Helsinki',                lon: 25.0,   lat: 60.2  },
+  { name: '塔林',      tz: 'Europe/Tallinn',                 lon: 24.7,   lat: 59.4  },
+  { name: '里加',      tz: 'Europe/Riga',                    lon: 24.1,   lat: 56.9  },
+  { name: '維爾紐斯',  tz: 'Europe/Vilnius',                 lon: 25.3,   lat: 54.7  },
+  // ── 歐洲東部 / 南部 ──
+  { name: '羅馬',      tz: 'Europe/Rome',                    lon: 12.5,   lat: 41.9  },
+  { name: '雅典',      tz: 'Europe/Athens',                  lon: 23.7,   lat: 37.9  },
+  { name: '伊斯坦堡',  tz: 'Europe/Istanbul',                lon: 29.0,   lat: 41.0  },
+  { name: '安卡拉',    tz: 'Europe/Istanbul',                lon: 32.9,   lat: 39.9  },
+  { name: '基輔',      tz: 'Europe/Kiev',                    lon: 30.5,   lat: 50.5  },
+  { name: '明斯克',    tz: 'Europe/Minsk',                   lon: 27.6,   lat: 53.9  },
+  { name: '布加勒斯特',tz: 'Europe/Bucharest',               lon: 26.1,   lat: 44.4  },
+  { name: '索菲亞',    tz: 'Europe/Sofia',                   lon: 23.3,   lat: 42.7  },
+  { name: '貝爾格勒',  tz: 'Europe/Belgrade',                lon: 20.5,   lat: 44.8  },
+  { name: '薩格勒布',  tz: 'Europe/Zagreb',                  lon: 16.0,   lat: 45.8  },
+  // ── 非洲北部 ──
+  { name: '開羅',      tz: 'Africa/Cairo',                   lon: 31.2,   lat: 30.1  },
+  { name: '卡薩布蘭卡',tz: 'Africa/Casablanca',              lon: -7.6,   lat: 33.6  },
+  { name: '突尼斯',    tz: 'Africa/Tunis',                   lon: 10.2,   lat: 36.8  },
+  { name: '阿爾及爾',  tz: 'Africa/Algiers',                 lon: 3.0,    lat: 36.7  },
+  { name: '的黎波里',  tz: 'Africa/Tripoli',                 lon: 13.2,   lat: 32.9  },
+  { name: '喀土穆',    tz: 'Africa/Khartoum',                lon: 32.5,   lat: 15.6  },
+  // ── 非洲西部 / 中部 ──
+  { name: '拉哥斯',    tz: 'Africa/Lagos',                   lon: 3.4,    lat: 6.5   },
+  { name: '阿克拉',    tz: 'Africa/Accra',                   lon: -0.2,   lat: 5.6   },
+  { name: '達卡(塞)',   tz: 'Africa/Dakar',                   lon: -17.4,  lat: 14.7  },
+  { name: '阿比讓',    tz: 'Africa/Abidjan',                 lon: -4.0,   lat: 5.4   },
+  // ── 非洲東部 / 南部 ──
+  { name: '亞的斯亞貝巴',tz:'Africa/Addis_Ababa',            lon: 38.7,   lat: 9.0   },
+  { name: '奈洛比',    tz: 'Africa/Nairobi',                 lon: 36.8,   lat: -1.3  },
+  { name: '坎帕拉',    tz: 'Africa/Kampala',                 lon: 32.6,   lat: 0.3   },
+  { name: '達累斯薩拉姆',tz:'Africa/Dar_es_Salaam',          lon: 39.3,   lat: -6.8  },
+  { name: '安塔那那利佛',tz:'Indian/Antananarivo',            lon: 47.5,   lat: -18.9 },
+  { name: '哈拉雷',    tz: 'Africa/Harare',                  lon: 31.1,   lat: -17.8 },
+  { name: '路沙卡',    tz: 'Africa/Lusaka',                  lon: 28.3,   lat: -15.4 },
+  { name: '約翰尼斯堡',tz: 'Africa/Johannesburg',            lon: 28.0,   lat: -26.2 },
+  { name: '開普敦',    tz: 'Africa/Johannesburg',            lon: 18.4,   lat: -33.9 },
+  // ── 北美 ──
+  { name: '紐約',      tz: 'America/New_York',               lon: -74.0,  lat: 40.7  },
+  { name: '華盛頓',    tz: 'America/New_York',               lon: -77.0,  lat: 38.9  },
+  { name: '波士頓',    tz: 'America/New_York',               lon: -71.1,  lat: 42.4  },
+  { name: '邁阿密',    tz: 'America/New_York',               lon: -80.2,  lat: 25.8  },
+  { name: '亞特蘭大',  tz: 'America/New_York',               lon: -84.4,  lat: 33.7  },
+  { name: '芝加哥',    tz: 'America/Chicago',                lon: -87.6,  lat: 41.9  },
+  { name: '休士頓',    tz: 'America/Chicago',                lon: -95.4,  lat: 29.8  },
+  { name: '達拉斯',    tz: 'America/Chicago',                lon: -96.8,  lat: 32.8  },
+  { name: '明尼阿波利斯',tz:'America/Chicago',               lon: -93.3,  lat: 44.9  },
+  { name: '丹佛',      tz: 'America/Denver',                 lon: -104.9, lat: 39.7  },
+  { name: '鳳凰城',    tz: 'America/Phoenix',                lon: -112.1, lat: 33.4  },
+  { name: '洛杉磯',    tz: 'America/Los_Angeles',            lon: -118.2, lat: 34.1  },
+  { name: '舊金山',    tz: 'America/Los_Angeles',            lon: -122.4, lat: 37.8  },
+  { name: '西雅圖',    tz: 'America/Los_Angeles',            lon: -122.3, lat: 47.6  },
+  { name: '拉斯維加斯',tz: 'America/Los_Angeles',            lon: -115.1, lat: 36.2  },
+  { name: '安克雷奇',  tz: 'America/Anchorage',             lon: -149.9, lat: 61.2  },
+  { name: '夏威夷',    tz: 'Pacific/Honolulu',               lon: -157.8, lat: 21.3  },
+  { name: '多倫多',    tz: 'America/Toronto',                lon: -79.4,  lat: 43.7  },
+  { name: '蒙特婁',    tz: 'America/Toronto',                lon: -73.6,  lat: 45.5  },
+  { name: '溫哥華',    tz: 'America/Vancouver',              lon: -123.1, lat: 49.2  },
+  { name: '卡加利',    tz: 'America/Edmonton',               lon: -114.1, lat: 51.0  },
+  // ── 中美洲 / 加勒比海 ──
+  { name: '墨西哥市',  tz: 'America/Mexico_City',            lon: -99.1,  lat: 19.4  },
+  { name: '瓜地馬拉市',tz: 'America/Guatemala',              lon: -90.5,  lat: 14.6  },
+  { name: '聖薩爾瓦多',tz: 'America/El_Salvador',            lon: -89.2,  lat: 13.7  },
+  { name: '馬那瓜',    tz: 'America/Managua',                lon: -86.3,  lat: 12.1  },
+  { name: '聖荷西(哥)',tz: 'America/Costa_Rica',             lon: -84.1,  lat: 9.9   },
+  { name: '巴拿馬城',  tz: 'America/Panama',                 lon: -79.5,  lat: 9.0   },
+  { name: '哈瓦那',    tz: 'America/Havana',                 lon: -82.3,  lat: 23.1  },
+  { name: '聖多明哥',  tz: 'America/Santo_Domingo',          lon: -69.9,  lat: 18.5  },
+  // ── 南美洲 ──
+  { name: '波哥大',    tz: 'America/Bogota',                 lon: -74.1,  lat: 4.7   },
+  { name: '加拉卡斯',  tz: 'America/Caracas',                lon: -66.9,  lat: 10.5  },
+  { name: '利馬',      tz: 'America/Lima',                   lon: -77.0,  lat: -12.0 },
+  { name: '基多',      tz: 'America/Guayaquil',              lon: -78.5,  lat: -0.2  },
+  { name: '拉巴斯',    tz: 'America/La_Paz',                 lon: -68.1,  lat: -16.5 },
+  { name: '亞松森',    tz: 'America/Asuncion',               lon: -57.6,  lat: -25.3 },
+  { name: '蒙特維多',  tz: 'America/Montevideo',             lon: -56.2,  lat: -34.9 },
+  { name: '布宜諾斯艾利斯',tz:'America/Argentina/Buenos_Aires',lon:-58.4, lat: -34.6 },
+  { name: '聖地牙哥',  tz: 'America/Santiago',              lon: -70.7,  lat: -33.4 },
+  { name: '聖保羅',    tz: 'America/Sao_Paulo',              lon: -46.6,  lat: -23.5 },
+  { name: '里約熱內盧',tz: 'America/Sao_Paulo',              lon: -43.2,  lat: -22.9 },
+  { name: '巴西利亞',  tz: 'America/Sao_Paulo',              lon: -47.9,  lat: -15.8 },
+  // ── 大洋洲 ──
+  { name: '雪梨',      tz: 'Australia/Sydney',               lon: 151.2,  lat: -33.9 },
+  { name: '墨爾本',    tz: 'Australia/Melbourne',            lon: 144.9,  lat: -37.8 },
+  { name: '布里斯本',  tz: 'Australia/Brisbane',             lon: 153.0,  lat: -27.5 },
+  { name: '阿德雷德',  tz: 'Australia/Adelaide',             lon: 138.6,  lat: -34.9 },
+  { name: '柏斯',      tz: 'Australia/Perth',                lon: 115.9,  lat: -31.9 },
+  { name: '達爾文',    tz: 'Australia/Darwin',               lon: 130.8,  lat: -12.5 },
+  { name: '奧克蘭',    tz: 'Pacific/Auckland',               lon: 174.8,  lat: -36.9 },
+  { name: '惠靈頓',    tz: 'Pacific/Auckland',               lon: 174.8,  lat: -41.3 },
+  { name: '蘇瓦',      tz: 'Pacific/Fiji',                   lon: 178.4,  lat: -18.1 },
+  { name: '努美阿',    tz: 'Pacific/Noumea',                 lon: 166.5,  lat: -22.3 },
+  { name: '帕皮提',    tz: 'Pacific/Tahiti',                 lon: -149.6, lat: -17.5 },
+  { name: '阿皮亞',    tz: 'Pacific/Apia',                   lon: -171.9, lat: -13.8 },
+];
+
+let selectedCity = WORLD_CITIES[0];
+
+function getUTCOffsetStr(tz) {
+  try {
+    const v = new Intl.DateTimeFormat('en', { timeZone: tz, timeZoneName: 'shortOffset' })
+      .formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value || 'UTC';
+    return v.replace('GMT', 'UTC');
+  } catch (e) { return 'UTC'; }
+}
+
+function _markerStyle(sel) {
+  const isLight = document.body.classList.contains('theme-light');
+  if (sel) {
+    return { radius: 9, fillColor: '#DC1E1E', color: 'rgba(220,30,30,0.35)', weight: 10, opacity: 1, fillOpacity: 1 };
+  }
+  return isLight
+    ? { radius: 5, fillColor: '#DC1E1E', color: 'rgba(220,30,30,0.25)', weight: 4, opacity: 1, fillOpacity: 0.88 }
+    : { radius: 4, fillColor: '#ffffff', color: 'rgba(255,255,255,0.22)', weight: 2, opacity: 1, fillOpacity: 0.75 };
+}
+
+function _applyMarkers() {
+  _leafMarkers.forEach((m, city) => {
+    const sel = city === selectedCity;
+    m.setRadius(sel ? 8 : 4);
+    m.setStyle(_markerStyle(sel));
+    m.unbindTooltip();
+    if (sel) {
+      m.bindTooltip(city.name, { permanent: true, direction: 'auto', className: 'city-label-sel' }).openTooltip();
+    } else {
+      m.bindTooltip(city.name, { direction: 'auto', className: 'city-label-hover' });
+    }
+  });
+}
+
+function initWorldMap() {
+  const container = document.getElementById('worldMapCanvas');
+  if (!container) return;
+  if (_leafMap) { _leafMap.invalidateSize(); _applyMarkers(); return; }
+
+  _leafMap = L.map(container, {
+    center: [25, 12], zoom: 2, minZoom: 1, maxZoom: 10,
+    zoomControl: true, attributionControl: false, worldCopyJump: true,
+  });
+
+  const isLight = document.body.classList.contains('theme-light');
+  const tileUrl = isLight
+    ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  _tileLayerRef = L.tileLayer(tileUrl, { subdomains: 'abcd', maxZoom: 20 }).addTo(_leafMap);
+
+  WORLD_CITIES.forEach(city => {
+    const sel = city === selectedCity;
+    const m = L.circleMarker([city.lat, city.lon], _markerStyle(sel));
+    if (sel) {
+      m.bindTooltip(city.name, { permanent: true, direction: 'auto', className: 'city-label-sel' }).openTooltip();
+    } else {
+      m.bindTooltip(city.name, { direction: 'auto', className: 'city-label-hover' });
+    }
+    m.on('click', () => {
+      selectedCity = city;
+      updateClock();
+      _applyMarkers();
+      _leafMap.flyTo([city.lat, city.lon], Math.max(_leafMap.getZoom(), 4), { duration: 0.7 });
+    });
+    m.addTo(_leafMap);
+    _leafMarkers.set(city, m);
+  });
+
+  window.addEventListener('resize', () => _leafMap && _leafMap.invalidateSize());
+}
+
+// ── CLOCK ──────────────────────────────────────────────────────────────────
+let clockInterval;
+let _timeOffset = 0; // ms offset between server time and local clock
+
+async function syncServerTime() {
+  try {
+    const r = await fetch('https://worldtimeapi.org/api/timezone/UTC', { cache: 'no-store' });
+    const d = await r.json();
+    if (d && d.unixtime) { _timeOffset = d.unixtime * 1000 - Date.now(); }
+  } catch (e) {
+    // fallback: try timeapi.io
+    try {
+      const r2 = await fetch('https://timeapi.io/api/time/current/zone?timeZone=UTC', { cache: 'no-store' });
+      const d2 = await r2.json();
+      if (d2 && d2.dateTime) {
+        const serverMs = new Date(d2.dateTime + 'Z').getTime();
+        if (!isNaN(serverMs)) _timeOffset = serverMs - Date.now();
+      }
+    } catch (e2) { _timeOffset = 0; }
+  }
+}
+
+function startClock() {
+  clearInterval(clockInterval);
+  syncServerTime();
+  updateClock();
+  requestAnimationFrame(() => requestAnimationFrame(initWorldMap));
+  clockInterval = setInterval(updateClock, 1000);
+}
+
+function updateClock() {
+  const city = selectedCity || WORLD_CITIES[0];
+  const now = new Date(Date.now() + _timeOffset);
+  try {
+    const t = now.toLocaleTimeString('zh-TW', { timeZone: city.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const d = now.toLocaleDateString('zh-TW', { timeZone: city.tz, year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+    document.getElementById('clockDisplay').textContent = t;
+    document.getElementById('clockDate').textContent = d;
+    document.getElementById('wtdCity').textContent = city.name;
+    document.getElementById('wtdOffset').textContent = getUTCOffsetStr(city.tz);
+  } catch (ex) {
+    const h = String(now.getHours()).padStart(2, '0'), m = String(now.getMinutes()).padStart(2, '0'), s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clockDisplay').textContent = h + ':' + m + ':' + s;
+    document.getElementById('clockDate').textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+    document.getElementById('wtdCity').textContent = city.name;
+    document.getElementById('wtdOffset').textContent = '';
+  }
+}
+
+// ── COUNTDOWN ──────────────────────────────────────────────────────────────
+let cdInterval, cdRemaining = 0, cdRunning = false;
+let _cdH = 0, _cdM = 5, _cdS = 0;
+
+function cdAdj(part, d) {
+  if (cdRunning) return;
+  if (part === 'h') _cdH = Math.max(0, Math.min(23, _cdH + d));
+  else if (part === 'm') _cdM = Math.max(0, Math.min(59, _cdM + d));
+  else _cdS = Math.max(0, Math.min(59, _cdS + d));
+  cdRemaining = 0;
+  renderCD();
+}
+function renderCD() {
+  document.getElementById('cdHDisp').textContent = String(_cdH).padStart(2, '0');
+  document.getElementById('cdMDisp').textContent = String(_cdM).padStart(2, '0');
+  document.getElementById('cdSDisp').textContent = String(_cdS).padStart(2, '0');
+}
+function renderCDTick() {
+  if (cdRemaining >= 0) {
+    const h = Math.floor(cdRemaining / 3600), m = Math.floor((cdRemaining % 3600) / 60), s = cdRemaining % 60;
+    document.getElementById('cdHDisp').textContent = String(h).padStart(2, '0');
+    document.getElementById('cdMDisp').textContent = String(m).padStart(2, '0');
+    document.getElementById('cdSDisp').textContent = String(s).padStart(2, '0');
+  } else {
+    // Overtime: show elapsed overtime
+    const over = Math.abs(cdRemaining);
+    const h = Math.floor(over / 3600), m = Math.floor((over % 3600) / 60), s = over % 60;
+    document.getElementById('cdOtH').textContent = String(h).padStart(2, '0');
+    document.getElementById('cdOtM').textContent = String(m).padStart(2, '0');
+    document.getElementById('cdOtS').textContent = String(s).padStart(2, '0');
+  }
+}
+function toggleCountdown() {
+  if (cdRunning) {
+    cdRunning = false; clearInterval(cdInterval);
+    document.querySelector('.cd-btn.go').textContent = '▶ 開始';
+    document.getElementById('cdMain').classList.remove('cd-running');
+    return;
+  }
+  if (!cdRemaining) { cdRemaining = _cdH * 3600 + _cdM * 60 + _cdS; }
+  if (!cdRemaining) return;
+  document.getElementById('cdOvertimeWrap').style.display = 'none';
+  document.getElementById('cdMain').style.display = '';
+  cdRunning = true;
+  document.querySelector('.cd-btn.go').textContent = '⏸ 暫停';
+  document.getElementById('cdMain').classList.add('cd-running');
+  cdInterval = setInterval(() => {
+    cdRemaining--;
+    renderCDTick();
+    if (cdRemaining === 0) {
+      // Hit zero: beep and immediately switch to overtime display
+      playBeep();
+      document.getElementById('cdMain').style.display = 'none';
+      document.getElementById('cdOvertimeWrap').style.display = 'flex';
+    }
+  }, 1000);
+}
+function resetCountdown() {
+  clearInterval(cdInterval); cdRunning = false; cdRemaining = 0;
+  document.querySelector('.cd-btn.go').textContent = '▶ 開始';
+  document.getElementById('cdMain').classList.remove('cd-running');
+  document.getElementById('cdMain').style.display = '';
+  document.getElementById('cdOvertimeWrap').style.display = 'none';
+  renderCD();
+}
+
+// ── STOPWATCH ──────────────────────────────────────────────────────────────
+let swStart = 0, swElapsed = 0, swRunning = false, swInterval, swLaps = [], swLastLap = 0;
+function toggleSW() {
+  if (swRunning) { swRunning = false; clearInterval(swInterval); swElapsed += Date.now() - swStart; document.getElementById('swBtn').textContent = '▶ 開始'; }
+  else { swRunning = true; swStart = Date.now(); swInterval = setInterval(renderSW, 33); document.getElementById('swBtn').textContent = '⏸ 暫停'; }
+}
+function resetSW() {
+  swRunning = false; clearInterval(swInterval); swElapsed = 0; swStart = 0; swLaps = []; swLastLap = 0;
+  document.getElementById('swBtn').textContent = '▶ 開始';
+  document.getElementById('swDisplay').textContent = '00:00';
+  document.getElementById('swMs').textContent = '.00';
+  document.getElementById('lapsList').innerHTML = '';
+}
+function addLap() {
+  if (!swRunning && !swElapsed) return;
+  const total = swRunning ? swElapsed + (Date.now() - swStart) : swElapsed;
+  const lapTime = total - swLastLap; swLastLap = total;
+  swLaps.push({ total, lapTime }); renderLaps();
+}
+function renderSW() {
+  const total = swElapsed + (swRunning ? Date.now() - swStart : 0);
+  const ms = Math.floor((total % 1000) / 10), s = Math.floor(total / 1000) % 60, m = Math.floor(total / 60000) % 60, h = Math.floor(total / 3600000);
+  document.getElementById('swDisplay').textContent = h > 0
+    ? (h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'))
+    : (String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'));
+  document.getElementById('swMs').textContent = '.' + String(ms).padStart(2, '0');
+}
+function renderLaps() {
+  const list = document.getElementById('lapsList');
+  const times = swLaps.map(l => l.lapTime);
+  const best = Math.min(...times), worst = Math.max(...times);
+  const ft = t => { const ms = Math.floor((t % 1000) / 10), s = Math.floor(t / 1000) % 60, m = Math.floor(t / 60000); return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + String(ms).padStart(2, '0'); };
+  list.innerHTML = swLaps.map((l, i) => {
+    const isB = l.lapTime === best && swLaps.length > 1, isW = l.lapTime === worst && swLaps.length > 1;
+    return '<div class="lap-row"><span class="lap-n">第' + (i + 1) + '圈</span><span class="lap-t ' + (isB ? 'lap-best' : isW ? 'lap-worst' : '') + '">' + ft(l.lapTime) + '</span><span class="lap-s">' + ft(l.total) + '</span></div>';
+  }).reverse().join('');
+}
+
+// ── POMODORO ───────────────────────────────────────────────────────────────
+let pomoPhase = 'work', pomoRunning = false, pomoInterval, pomoRemaining;
+let pomoSession = 1, pomoCycles = 4, pomoCompletedInCycle = 0;
+const POMO_LABELS = { work: '工作時間', short: '短暫休息', long: '長休息' };
+const POMO_GRAD = { work: ['#30D158', '#38f9d7'], short: ['#4facfe', '#00f2fe'], long: ['#AF52DE', '#FF6CAB'] };
+
+function getPomoSecs(ph) {
+  return { work: parseInt(document.getElementById('workMin').value) * 60 || 1500, short: parseInt(document.getElementById('shortMin').value) * 60 || 300, long: parseInt(document.getElementById('longMin').value) * 60 || 900 }[ph];
+}
+function updatePomoTimes() { if (!pomoRunning) { pomoRemaining = getPomoSecs(pomoPhase); renderPomo(); } }
+function updateCycles() { pomoCycles = parseInt(document.getElementById('cycleCount').value) || 4; renderDots(); }
+
+function setPomoPhase(ph) {
+  pomoPhase = ph; pomoRunning = false; clearInterval(pomoInterval);
+  pomoRemaining = getPomoSecs(ph);
+  document.querySelectorAll('.pomo-tab').forEach((t, i) => t.classList.toggle('active', ['work', 'short', 'long'][i] === ph));
+  document.getElementById('pomoPlayBtn').textContent = '▶';
+  const cols = POMO_GRAD[ph];
+  document.getElementById('rg1').setAttribute('stop-color', cols[0]);
+  document.getElementById('rg2').setAttribute('stop-color', cols[1]);
+  renderPomo();
+}
+
+function togglePomo() {
+  if (!pomoRemaining) pomoRemaining = getPomoSecs(pomoPhase);
+  if (pomoRunning) {
+    pomoRunning = false; clearInterval(pomoInterval);
+    document.getElementById('pomoPlayBtn').textContent = '▶';
+  } else {
+    pomoRunning = true; document.getElementById('pomoPlayBtn').textContent = '⏸';
+    pomoInterval = setInterval(() => {
+      pomoRemaining--; renderPomo();
+      if (pomoRemaining <= 0) {
+        clearInterval(pomoInterval); pomoRunning = false;
+        document.getElementById('pomoPlayBtn').textContent = '▶';
+        onPomoComplete();
+      }
+    }, 1000);
+  }
+}
+
+function onPomoComplete() {
+  playBeep();
+  if (pomoPhase === 'work') {
+    pomoCompletedInCycle++;
+    renderDots();
+    if (pomoCompletedInCycle >= pomoCycles) { pomoSession++; pomoCompletedInCycle = 0; setPomoPhase('long'); }
+    else setPomoPhase('short');
+  } else setPomoPhase('work');
+}
+
+function resetPomo() {
+  pomoRunning = false; clearInterval(pomoInterval);
+  pomoRemaining = getPomoSecs(pomoPhase);
+  document.getElementById('pomoPlayBtn').textContent = '▶';
+  renderPomo();
+}
+
+function skipPomoPhase() {
+  pomoRunning = false; clearInterval(pomoInterval);
+  if (pomoPhase === 'work') onPomoComplete(); else setPomoPhase('work');
+}
+
+function renderPomo() {
+  const total = getPomoSecs(pomoPhase);
+  if (pomoRemaining === undefined) pomoRemaining = total;
+  const m = Math.floor(pomoRemaining / 60), s = pomoRemaining % 60;
+  document.getElementById('pomoTime').textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  document.getElementById('pomoLabel').textContent = POMO_LABELS[pomoPhase];
+  document.getElementById('pomoSession').textContent = '第' + pomoSession + '輪 (' + pomoCompletedInCycle + '/' + pomoCycles + ')';
+  const prog = pomoRemaining / total;
+  document.getElementById('ringProg').style.strokeDashoffset = 603.2 * prog;
+  document.title = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ' - 番茄鐘';
+}
+
+function renderDots() {
+  const dots = document.getElementById('pomoDots'); dots.innerHTML = '';
+  for (let i = 0; i < pomoCycles; i++) {
+    const d = document.createElement('div'); d.className = 'p-dot';
+    if (i < pomoCompletedInCycle) d.classList.add('done');
+    else if (i === pomoCompletedInCycle && pomoPhase === 'work') d.classList.add('current');
+    dots.appendChild(d);
+  }
+}
+
+// ── BEEP ───────────────────────────────────────────────────────────────────
+function playBeep() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784].forEach(function (freq, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.frequency.value = freq; o.type = 'sine';
+      g.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
+      g.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i * 0.15 + 0.05);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.15 + 0.3);
+      o.start(ctx.currentTime + i * 0.15); o.stop(ctx.currentTime + i * 0.15 + 0.35);
+    });
+  } catch (e) {}
+}
+
+// ── SWIPE-SPIN UTILITY ────────────────────────────────────────────────────
+function addSwipeSpin(el, onDelta, pxPerStep) {
+  if (!el) return;
+  pxPerStep = pxPerStep || 8;
+  let y0 = 0, acc = 0, on = false, drag = false;
+  el.addEventListener('touchstart', e => {
+    y0 = e.touches[0].clientY; acc = 0; on = true; drag = false;
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if (!on) return;
+    const dy = y0 - e.touches[0].clientY;
+    if (!drag && Math.abs(dy) < 6) return;
+    drag = true; e.preventDefault();
+    const step = Math.round(dy / pxPerStep);
+    const inc = step - acc; if (inc) { onDelta(inc); acc = step; }
+  }, { passive: false });
+  el.addEventListener('touchend', () => { on = false; drag = false; });
+  el.addEventListener('mousedown', e => { y0 = e.clientY; acc = 0; on = true; drag = false; e.preventDefault(); });
+  window.addEventListener('mousemove', e => {
+    if (!on) return;
+    const dy = y0 - e.clientY;
+    if (!drag && Math.abs(dy) < 4) return;
+    drag = true;
+    const step = Math.round(dy / pxPerStep);
+    const inc = step - acc; if (inc) { onDelta(inc); acc = step; }
+  });
+  window.addEventListener('mouseup', () => { on = false; drag = false; });
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+pomoRemaining = getPomoSecs('work');
+renderPomo();
+renderDots();
+(function () {
+  const h = location.hash.replace('#', '');
+  switchMode(MODES.includes(h) ? h : 'clock', false);
+})();
+
+// Countdown digit swipe — H/M/S
+addSwipeSpin(document.querySelector('#cdMain .cd-unit:nth-child(1)'), d => cdAdj('h', d), 8);
+addSwipeSpin(document.querySelector('#cdMain .cd-unit:nth-child(3)'), d => cdAdj('m', d), 8);
+addSwipeSpin(document.querySelector('#cdMain .cd-unit:nth-child(5)'), d => cdAdj('s', d), 8);
+
+// Pomodoro settings inputs swipe
+['workMin','shortMin','longMin','cycleCount'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  addSwipeSpin(el, d => {
+    const cur = parseInt(el.value) || 1;
+    el.value = Math.max(parseInt(el.min) || 1, Math.min(parseInt(el.max) || 99, cur + d));
+    el.dispatchEvent(new Event('change'));
+  }, 6);
+});
+</script>
+</body>
+</html>

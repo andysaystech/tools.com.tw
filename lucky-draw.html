@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抽抽樂 ✦ 互動工具箱</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#667eea;--bg2:#764ba2;
+  --glass:rgba(255,255,255,0.12);
+  --glass-border:rgba(255,255,255,0.25);
+  --text:#fff;--text2:rgba(255,255,255,0.7);
+  --accent:#f093fb;--accent2:#fda085;
+  --radius:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;min-height:100vh;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);overflow-x:hidden}
+
+body[data-theme=""]{
+  background:#eef8ef;
+  --text:#1e3d24;--text2:#5a7c60;
+  --glass:rgba(255,255,255,0.88);--glass-border:rgba(0,100,30,0.18);
+  --accent:#2a9a50;--accent2:#1e7a3a;
+}
+body[data-theme=""] .panel,
+body[data-theme=""] .canvas-panel,
+body[data-theme=""] .history-panel{
+  background:#fff;border:1px solid rgba(0,80,20,0.08)!important;backdrop-filter:none!important;
+  box-shadow:0 2px 16px rgba(0,0,0,0.06)!important;
+}
+body[data-theme=""] .spin-btn{
+  background:linear-gradient(135deg,#2a9a50,#1e7a3a)!important;
+  color:#fff!important;border:none!important;
+  box-shadow:0 6px 20px rgba(30,122,58,0.35)!important;
+}
+body[data-theme=""] .spin-btn:hover{
+  box-shadow:0 10px 28px rgba(30,122,58,0.45)!important;
+}
+body[data-theme=""] .mode-btn.active,
+body[data-theme=""] .mode-btn:hover{
+  background:linear-gradient(135deg,#2a9a50,#1e7a3a)!important;color:#fff!important;
+  box-shadow:0 4px 18px rgba(30,122,58,.35)!important;
+}
+body[data-theme=""] .option-input input,
+body[data-theme=""] .option-input textarea{
+  background:#fff!important;
+  border:1px solid rgba(0,80,20,0.12)!important;
+  box-shadow:none!important;color:#1e3d24!important;
+}
+body[data-theme=""] .result-box{
+  background:#f5faf6;border:1px solid rgba(0,80,20,0.08);
+  box-shadow:inset 0 1px 4px rgba(0,0,0,0.04);
+}
+body[data-theme=""] .hist-item{background:rgba(0,0,0,0.04);border-color:transparent}
+body[data-theme=""] .btn-add{
+  background:linear-gradient(135deg,#2a9a50,#1e7a3a)!important;
+}
+body[data-theme=""] .app-tab{color:rgba(30,61,36,0.45)}
+body[data-theme=""] .app-tab.active{color:#2a9a50}
+
+body[data-theme="neon"]{
+  background:linear-gradient(135deg,#0a0a1a,#1a0a2e);
+  --text:#fff;--text2:rgba(0,255,255,0.7);
+  --glass:rgba(0,255,255,0.04);--glass-border:rgba(0,255,255,0.25);
+}
+body[data-theme="neon"] .panel,
+body[data-theme="neon"] .canvas-panel,
+body[data-theme="neon"] .history-panel{
+  box-shadow:0 0 30px rgba(0,255,255,0.1)!important;
+}
+body[data-theme="neon"] .spin-btn{
+  background:transparent!important;
+  border:2px solid #00ffff!important;color:#00ffff!important;
+  box-shadow:0 0 20px rgba(0,255,255,0.3)!important;
+}
+body[data-theme="neon"] .spin-btn:hover{
+  background:rgba(0,255,255,0.1)!important;
+  box-shadow:0 0 40px rgba(0,255,255,0.5)!important;
+}
+body[data-theme="neon"] .result-text{text-shadow:0 0 20px var(--accent)}
+
+/* ── APP TAB BAR ── */
+.app-tabs{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  display:flex;height:58px;align-items:center;
+  background:rgba(44,44,46,0.96);
+  backdrop-filter:saturate(180%) blur(40px);
+  -webkit-backdrop-filter:saturate(180%) blur(40px);
+  border-bottom:.5px solid rgba(255,255,255,0.10);
+}
+body[data-theme=""] .app-tabs{background:rgba(255,255,255,0.98)!important;border-bottom-color:rgba(0,0,0,0.08)!important}
+body[data-theme="neon"] .app-tabs{background:rgba(44,44,46,0.96)!important;border-bottom-color:rgba(255,255,255,0.10)!important}
+.app-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-decoration:none;color:rgba(255,255,255,0.38);gap:2px;
+  font-size:.55rem;font-weight:500;transition:color .15s;-webkit-tap-highlight-color:transparent;
+}
+.app-tab .ti{font-size:1.35rem;line-height:1.1}
+.app-tab.active{color:#f093fb}
+.app-tab:active{opacity:.6}
+/* ── NAV THEME DOTS ── */
+.nav-theme{display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;flex-shrink:0}
+.nav-t-dot{width:17px;height:17px;border-radius:50%;cursor:pointer;transition:transform .2s,box-shadow .2s;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(128,128,128,0.25)}
+.nav-t-dot:hover{transform:scale(1.15)}
+.nav-t-dot.active{transform:scale(1.18);box-shadow:0 0 0 2.5px rgba(255,255,255,0.9),0 0 0 1.5px rgba(0,0,0,0.2)}
+.td-light{background:linear-gradient(135deg,#f8f8f8,#d8d8de)}
+.td-dark{background:linear-gradient(135deg,#0a0818,#1e1e50)}
+
+/* legacy theme dots */
+.nav-theme-row{display:flex;gap:8px;justify-content:center;padding:8px 0 0}
+.theme-btns{display:flex;gap:8px}
+.theme-btn{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);cursor:pointer;transition:all 0.3s}
+.theme-btn:hover,.theme-btn.active{transform:scale(1.2);border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,0.4)}
+.t-glass{background:linear-gradient(135deg,#667eea,#764ba2)}
+.t-neu{background:linear-gradient(135deg,#e0e5ec,#c8d0dc)}
+.t-neon{background:linear-gradient(135deg,#0a0a1a,#00ffff)}
+
+.mode-switcher{
+  display:flex;gap:10px;align-items:center;justify-content:center;
+  padding:calc(58px + 14px) 20px 10px;flex-wrap:wrap;
+}
+.mode-switcher .theme-btns{display:flex;gap:7px;margin-left:auto}
+.mode-btn{
+  padding:9px 22px;border-radius:40px;border:1px solid var(--glass-border);
+  background:var(--glass);backdrop-filter:blur(10px);
+  color:var(--text);
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:0.92rem;font-weight:500;line-height:1.35;
+  cursor:pointer;transition:all 0.3s;
+  display:inline-flex;align-items:center;justify-content:center;
+  white-space:nowrap;
+}
+.mode-btn.active,.mode-btn:hover{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;box-shadow:0 4px 20px rgba(240,147,251,0.4);
+  transform:translateY(-2px)}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:8px 20px 40px;max-width:1300px;margin:0 auto}
+@media(max-width:900px){.main{grid-template-columns:1fr;padding:8px 12px}}
+
+.right-col{display:flex;flex-direction:column;gap:16px}
+
+/* CANVAS PANEL */
+.canvas-panel{
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+#mainCanvas{border-radius:12px;display:block}
+
+.spin-btn{
+  padding:14px 48px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#f093fb,#f5576c,#fda085);
+  color:#fff;font-size:1.15rem;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.3s;
+  box-shadow:0 8px 28px rgba(240,147,251,0.5);
+  position:relative;overflow:hidden;
+}
+.spin-btn::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(rgba(255,255,255,0.2),transparent);pointer-events:none}
+.spin-btn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(240,147,251,0.6)}
+.spin-btn:active{transform:scale(0.97)}
+.spin-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+
+.result-box{
+  width:100%;padding:14px 20px;border-radius:14px;
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  text-align:center;min-height:56px;display:flex;align-items:center;
+  justify-content:center;flex-wrap:wrap;overflow:hidden;
+}
+.result-text{
+  font-size:clamp(1rem,2.5vw,1.5rem);font-weight:700;letter-spacing:1px;
+  word-break:break-word;text-align:center;
+}
+.result-hint{font-size:0.85rem;color:var(--text2)}
+
+
+/* RIGHT PANELS */
+.panel,.history-panel{
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;gap:14px;
+}
+.panel h3,.history-panel h3{font-size:0.95rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.panel h3 span,.history-panel h3 span{font-size:1.1rem}
+
+.option-input{display:flex;gap:8px;align-items:flex-start}
+.option-input input,.option-input textarea{
+  flex:1;padding:9px 12px;border-radius:11px;border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.1);color:var(--text);font-family:inherit;font-size:0.88rem;
+  outline:none;transition:all 0.3s;
+}
+.option-input textarea{
+  resize:none;min-height:38px;max-height:120px;overflow-y:auto;line-height:1.5;
+  white-space:pre-wrap;word-break:break-all;
+}
+.option-input input:focus,.option-input textarea:focus{border-color:var(--accent);background:rgba(255,255,255,0.16)}
+.option-input input::placeholder,.option-input textarea::placeholder{color:var(--text2)}
+.option-hint{font-size:.68rem;color:var(--text2);padding:2px 2px 0;letter-spacing:.01em}
+.btn-add{padding:9px 14px;border-radius:11px;border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-size:1rem;cursor:pointer;font-family:inherit;transition:all 0.3s;font-weight:700}
+.btn-add:hover{transform:scale(1.06)}
+
+.options-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+.options-list::-webkit-scrollbar{width:3px}
+.options-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}
+.option-item{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.08);border-radius:9px;padding:8px 10px;
+  animation:slideIn 0.25s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.option-color{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.option-name{
+  flex:1;font-size:0.85rem;
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-family:inherit;
+  padding:1px 4px;border-radius:5px;cursor:text;
+  min-width:0;
+}
+.option-name:hover{background:rgba(255,255,255,0.1)}
+.option-name:focus{background:rgba(255,255,255,0.15);outline:1.5px solid rgba(255,255,255,0.35)}
+.option-del{width:22px;height:22px;border-radius:50%;border:none;
+  background:rgba(255,100,100,0.2);color:rgba(255,150,150,1);
+  cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0}
+.option-del:hover{background:rgba(255,80,80,0.4);transform:scale(1.1)}
+
+.toggle-row{display:flex;align-items:center;gap:10px}
+.toggle-label{font-size:0.85rem;color:var(--text2);flex:1}
+.toggle{width:44px;height:24px;border-radius:12px;background:rgba(255,255,255,0.2);
+  border:none;cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+  background:#fff;top:3px;left:3px;transition:all 0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2)}
+.toggle.on{background:linear-gradient(135deg,#43e97b,#38f9d7)}
+.toggle.on::after{left:23px}
+
+.btn-clear{padding:7px;border-radius:9px;border:none;
+  background:rgba(255,100,100,0.15);color:rgba(255,150,150,1);
+  font-family:inherit;font-size:0.78rem;cursor:pointer;transition:all 0.2s;width:100%;text-align:center}
+.btn-clear:hover{background:rgba(255,80,80,0.25)}
+.btn-reset{padding:7px;border-radius:9px;border:none;
+  background:rgba(100,150,255,0.15);color:rgba(150,200,255,1);
+  font-family:inherit;font-size:0.78rem;cursor:pointer;transition:all 0.2s;width:100%}
+.btn-reset:hover{background:rgba(100,150,255,0.25)}
+
+/* HISTORY PANEL */
+.history-panel{flex:1}
+.hist-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}
+.hist-list::-webkit-scrollbar{width:3px}
+.hist-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:2px}
+.hist-item{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);
+  border-radius:9px;padding:8px 10px;
+  animation:slideIn 0.25s ease;
+}
+.hist-seq{font-size:.65rem;font-weight:700;color:var(--accent);flex-shrink:0;min-width:1.8em;text-align:right;opacity:.8}
+.hist-mode{font-size:0.85rem;flex-shrink:0}
+.hist-result{flex:1;font-size:0.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-time{font-size:0.68rem;color:var(--text2);flex-shrink:0}
+.hist-empty{font-size:0.82rem;color:var(--text2);text-align:center;padding:16px 0}
+
+@keyframes sPop{0%{transform:scale(1)}50%{transform:scale(1.14)}100%{transform:scale(1)}}
+
+/* CONFETTI */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+.confetti-piece{position:absolute;animation:confettiFall 3s ease-in forwards}
+@keyframes confettiFall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+</style>
+</head>
+<body>
+<nav class="app-tabs">
+  <a href="index.html" class="app-tab"><span class="ti">🏠</span><span>首頁</span></a>
+  <a href="lucky-draw.html" class="app-tab active"><span class="ti">🎡</span><span>抽抽樂</span></a>
+  <a href="numbers.html" class="app-tab"><span class="ti">🎱</span><span>抽數字</span></a>
+  <a href="score-counter.html" class="app-tab"><span class="ti">🏆</span><span>計數</span></a>
+  <a href="pomodoro.html" class="app-tab"><span class="ti">🌱</span><span>時間</span></a>
+  <a href="currency.html" class="app-tab"><span class="ti">💱</span><span>匯率</span></a>
+  <a href="todo.html" class="app-tab"><span class="ti">✅</span><span>待辦</span></a>
+  <div class="nav-theme">
+    <div class="nav-t-dot td-light" onclick="setTheme('')" title="淺色"></div>
+    <div class="nav-t-dot td-dark" onclick="setTheme('neon')" title="深色"></div>
+  </div>
+</nav>
+<div class="mode-switcher">
+  <button class="mode-btn active" onclick="switchMode('wheel')">🎡 幸運輪盤</button>
+  <button class="mode-btn" onclick="switchMode('straw')">🎋 抽籤筒</button>
+</div>
+
+<div class="main">
+  <!-- LEFT: Canvas + Action -->
+  <div class="canvas-panel" id="canvasPanel">
+    <canvas id="mainCanvas" width="460" height="460"></canvas>
+    <div class="result-box" id="resultBox">
+      <span class="result-hint">按下按鈕開始！</span>
+    </div>
+    <button class="spin-btn" id="spinBtn" onclick="doAction()">✨ 開始轉動！</button>
+  </div>
+
+  <!-- RIGHT: Options + History -->
+  <div class="right-col">
+    <!-- Options Panel (wheel & straw only) -->
+    <div class="panel" id="optionsPanel">
+      <h3><span>📝</span> 選項管理</h3>
+      <div class="option-input">
+        <textarea id="optionInput" rows="1" placeholder="輸入選項…"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addOption()}"
+          oninput="autoResizeTA(this)"></textarea>
+        <button class="btn-add" onclick="addOption()">+</button>
+      </div>
+      <div class="option-hint">可批次貼入多行選項（Shift+Enter 換行）</div>
+      <div class="options-list" id="optionsList"></div>
+      <div class="toggle-row">
+        <span class="toggle-label">抽中後移除選項</span>
+        <button class="toggle" id="removeToggle" onclick="toggleRemove()"></button>
+      </div>
+      <button class="btn-clear" onclick="clearOptions()">🗑 清除所有選項</button>
+      <button class="btn-reset" onclick="resetDefault()">↺ 還原預設</button>
+    </div>
+
+    <!-- History Panel (always visible) -->
+    <div class="history-panel">
+      <h3><span>📜</span> 抽取紀錄</h3>
+      <div class="hist-list" id="histList">
+        <div class="hist-empty">還沒有記錄</div>
+      </div>
+      <button class="btn-clear" onclick="clearHistory()">🗑 清除所有紀錄</button>
+    </div>
+  </div>
+</div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// =============================================
+// STATE
+// =============================================
+let mode = 'wheel';
+let removeAfterPick = false;
+let options = ['牛肉麵','炒飯','麥當勞','滷味','便當','麵線','義大利麵'];
+let actionBlocked = false;
+let diceCount = 1;
+let history = [];
+let histSeq = 0;
+
+const COLORS = [
+  ['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],
+  ['#fa709a','#fee140'],['#a18cd1','#fbc2eb'],['#fd7043','#ff8a65'],
+  ['#667eea','#764ba2'],['#f77062','#fe5196'],['#11998e','#38ef7d'],
+  ['#fc4a1a','#f7b733'],['#c471ed','#f64f59'],['#12c2e9','#c471ed']
+];
+function getColor(i){return COLORS[i%COLORS.length]}
+
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+// Responsive canvas sizing — JS controls BOTH attribute and CSS size
+function resizeMainCanvas(){
+  const panel = document.querySelector('.canvas-panel');
+  if(!panel) return;
+  const padH = 40; // panel horizontal padding
+  const available = panel.clientWidth - padH;
+  // On mobile, also limit by viewport height so it doesn't overflow
+  const maxByHeight = Math.floor(window.innerHeight * 0.58);
+  const size = Math.min(available, 520, maxByHeight);
+  canvas.width  = size;
+  canvas.height = size;
+  canvas.style.width  = size + 'px';
+  canvas.style.height = size + 'px';
+  if(mode==='wheel') drawWheel();
+  else if(mode==='straw') drawStraw();
+}
+window.addEventListener('resize', resizeMainCanvas);
+
+// =============================================
+// HISTORY
+// =============================================
+function addHistory(modeIcon, result){
+  const now = new Date();
+  const time = now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  histSeq++;
+  history.unshift({modeIcon, result, time, seq: histSeq});
+  if(history.length>50) history.pop();
+  renderHistory();
+}
+function renderHistory(){
+  const list = document.getElementById('histList');
+  if(!history.length){
+    list.innerHTML='<div class="hist-empty">還沒有記錄</div>';
+    return;
+  }
+  list.innerHTML = history.map(h=>`
+    <div class="hist-item">
+      <span class="hist-seq">#${h.seq}</span>
+      <span class="hist-mode">${h.modeIcon}</span>
+      <span class="hist-result" title="${h.result}">${h.result}</span>
+      <span class="hist-time">${h.time}</span>
+    </div>`).join('');
+}
+function clearHistory(){history=[];histSeq=0;renderHistory();}
+
+// =============================================
+// WHEEL
+// =============================================
+let wheelRotation = 0;
+let wheelVelocity = 0;
+let wheelRaf = null;
+
+function drawWheel(){
+  const W=canvas.width, H=canvas.height;
+  const cx=W/2, cy=H/2;
+  const s=W/460; // scale factor relative to original 460px design
+  const R=Math.min(cx,cy)-28*s;
+  ctx.clearRect(0,0,W,H);
+  if(!options.length){
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.font=`bold ${Math.round(18*s)}px Noto Sans TC`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('請先新增選項！',cx,cy);
+    return;
+  }
+  const n=options.length;
+  const slice=(2*Math.PI)/n;
+
+  // Outer glow ring
+  ctx.save();
+  ctx.shadowColor='rgba(240,147,251,0.4)';ctx.shadowBlur=24*s;
+  ctx.beginPath();ctx.arc(cx,cy,R+14*s,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=28*s;ctx.stroke();
+  ctx.restore();
+
+  // Draw slices
+  options.forEach((opt,i)=>{
+    const start=wheelRotation+i*slice;
+    const end=start+slice;
+    const [c1,c2]=getColor(i);
+    const grad=ctx.createLinearGradient(
+      cx+Math.cos(start+slice/2)*(R*0.25), cy+Math.sin(start+slice/2)*(R*0.25),
+      cx+Math.cos(start+slice/2)*R, cy+Math.sin(start+slice/2)*R
+    );
+    grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,start,end);ctx.closePath();
+    ctx.fillStyle=grad;ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=2;ctx.stroke();
+
+    // Text
+    ctx.save();
+    ctx.translate(cx,cy);ctx.rotate(start+slice/2);
+    ctx.textAlign='right';
+    const baseFontSize=n>12?10:n>8?12:14;
+    ctx.font=`bold ${Math.round(baseFontSize*s)}px Noto Sans TC`;
+    ctx.fillStyle='rgba(255,255,255,0.95)';
+    ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=4;
+    const label=opt.length>8?opt.slice(0,7)+'…':opt;
+    ctx.fillText(label,R-12*s,4*s);
+    ctx.restore();
+  });
+
+  // Center hub
+  const hubR=34*s;
+  const hubGrad=ctx.createRadialGradient(cx,cy,0,cx,cy,hubR);
+  hubGrad.addColorStop(0,'#fff');hubGrad.addColorStop(1,'#ddd');
+  ctx.beginPath();ctx.arc(cx,cy,hubR,0,Math.PI*2);
+  ctx.fillStyle=hubGrad;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=4*s;ctx.stroke();
+  ctx.fillStyle='#9b59b6';ctx.font=`bold ${Math.round(20*s)}px sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('✦',cx,cy);
+
+  // Pointer (right side) — tip points LEFT toward wheel
+  const px=cx+R+14*s;
+  const pa=26*s, pb=13*s, pc=6*s;
+  ctx.save();ctx.translate(px,cy);
+  const pGrad=ctx.createLinearGradient(pa,0,-pc,0);
+  pGrad.addColorStop(0,'#f093fb');pGrad.addColorStop(1,'#f5576c');
+  ctx.shadowColor='rgba(240,147,251,0.7)';ctx.shadowBlur=14*s;
+  ctx.beginPath();ctx.moveTo(pa,-pb);ctx.lineTo(-pc,0);ctx.lineTo(pa,pb);
+  ctx.closePath();ctx.fillStyle=pGrad;ctx.fill();
+  ctx.restore();
+
+  // Tick marks
+  for(let i=0;i<n;i++){
+    const angle=wheelRotation+i*slice;
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
+    ctx.beginPath();ctx.moveTo(R+2*s,0);ctx.lineTo(R+16*s,0);
+    ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=2;ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function spinWheel(){
+  if(actionBlocked||options.length===0)return;
+  actionBlocked=true;
+  cancelAnimationFrame(wheelRaf);
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('resultBox').innerHTML='<span class="result-hint">轉動中...</span>';
+
+  // Faster: higher velocity, faster deceleration
+  wheelVelocity = 0.55 + Math.random()*0.35;
+  const decel = 0.962 + Math.random()*0.005;
+
+  function animate(){
+    wheelRotation += wheelVelocity;
+    wheelVelocity *= decel;
+    drawWheel();
+    if(wheelVelocity > 0.004){
+      wheelRaf = requestAnimationFrame(animate);
+    } else {
+      actionBlocked=false;
+      document.getElementById('spinBtn').disabled=false;
+      const n=options.length;
+      const slice=(2*Math.PI)/n;
+      const norm=((((-wheelRotation)%(2*Math.PI))+(2*Math.PI))%(2*Math.PI));
+      const idx=Math.floor(norm/slice)%n;
+      const winner=options[idx];
+      showResult(winner,'🎡');
+      if(removeAfterPick){
+        setTimeout(()=>{options.splice(idx,1);renderOptionsList();drawWheel();},1000);
+      }
+    }
+  }
+  animate();
+}
+
+// =============================================
+// STRAW — SPINNING CYLINDER ANIMATION
+// =============================================
+let strawAngle = 0;
+let strawPhase = 'idle'; // idle | spin | slowdown | flyout | done
+let strawSpinSpeed = 0;
+let strawTimer = 0;
+let strawWinner = -1;
+let strawFlyProg = 0;
+let strawRaf = null;
+
+// Cylinder geometry — dynamically computed from canvas size
+function getCYL(){
+  const W=canvas.width;
+  const s=W/460; // scale relative to original 460px design
+  return {
+    cx: W/2,
+    rimY: W*0.5,
+    rx: 82*s,
+    ry: 20*s,
+    h:  165*s,
+    sr: 50*s,
+    s:  s
+  };
+}
+
+function drawStraw(){
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  if(!options.length){
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.font=`bold ${Math.round(18*W/460)}px Noto Sans TC`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('請先新增選項！',W/2,H/2);
+    return;
+  }
+  const {cx,rimY,rx,ry,h,sr,s} = getCYL();
+  const n = options.length;
+  const botY = rimY + h;
+
+  // ---- 1. Cylinder shadow ----
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=40*s;ctx.shadowOffsetY=15*s;
+  ctx.beginPath();ctx.ellipse(cx,botY+ry,rx*0.7,ry*0.5,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fill();
+  ctx.restore();
+
+  // ---- 2. Cylinder back (bottom half) ----
+  ctx.beginPath();
+  ctx.ellipse(cx,botY,rx,ry,0,0,Math.PI*2);
+  ctx.fillStyle='rgba(60,30,8,0.9)';ctx.fill();
+
+  // Cylinder walls
+  const wallGrad=ctx.createLinearGradient(cx-rx,0,cx+rx,0);
+  wallGrad.addColorStop(0,'#3a1a05');
+  wallGrad.addColorStop(0.18,'#8a5215');
+  wallGrad.addColorStop(0.5,'#b87030');
+  wallGrad.addColorStop(0.82,'#8a5215');
+  wallGrad.addColorStop(1,'#2a0e03');
+  ctx.beginPath();
+  ctx.moveTo(cx-rx, rimY+ry);
+  ctx.lineTo(cx-rx, botY);
+  ctx.ellipse(cx,botY,rx,ry,0,Math.PI,0);
+  ctx.lineTo(cx+rx,rimY+ry);
+  ctx.ellipse(cx,rimY+ry,rx,ry,0,0,Math.PI);
+  ctx.fillStyle=wallGrad;ctx.fill();
+
+  // Wood grain
+  ctx.save();ctx.globalAlpha=0.06;
+  for(let i=0;i<11;i++){
+    const x=cx-rx+12*s+(rx*2-20*s)*i/10;
+    ctx.beginPath();ctx.moveTo(x,rimY+ry+4*s);ctx.lineTo(x,botY-4*s);
+    ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  ctx.globalAlpha=1;ctx.restore();
+
+  // ---- 3. Inside of cylinder (dark hole — drawn BEFORE sticks) ----
+  ctx.save();
+  ctx.beginPath();ctx.ellipse(cx,rimY+ry,rx-5*s,ry-2*s,0,0,Math.PI*2);
+  const insideGrad=ctx.createRadialGradient(cx,rimY+ry,sr*0.15,cx,rimY+ry,rx);
+  insideGrad.addColorStop(0,'rgba(25,10,4,0.70)');
+  insideGrad.addColorStop(0.55,'rgba(38,16,5,0.85)');
+  insideGrad.addColorStop(1,'rgba(55,22,6,0.96)');
+  ctx.fillStyle=insideGrad;ctx.fill();
+  ctx.restore();
+
+  // ---- 4. Spinning sticks — clipped to two safe regions ----
+  // Region A: above the rim top (sticks poke out)
+  // Region B: inside the cylinder opening ellipse (sticks visible in the mouth)
+  const sticks=[];
+  for(let i=0;i<n;i++){
+    const angle = strawAngle + (i/n)*Math.PI*2;
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const sx = cx + cosA * sr;
+    const depth = (sinA+1)/2;
+    const aboveRim = (12 + depth*30)*s; // how far tip pokes above rim center
+    const stickTopY = rimY+ry - aboveRim;
+    // Total visible length: above-rim part + small stub inside the opening
+    const stickH = aboveRim + ry*1.6;
+    const sw = (5 + depth*5)*s;
+    const isWinner = (i===strawWinner) && (strawPhase==='flyout'||strawPhase==='done');
+    sticks.push({i,sx,depth,stickTopY,stickH,sw,aboveRim,isWinner,angle});
+  }
+  sticks.sort((a,b)=>a.depth-b.depth);
+
+  function _drawSticks(list){
+    list.forEach(st=>{
+      if(st.isWinner) return;
+      const [c1,c2]=getColor(st.i);
+      const alpha = Math.max(0.35, 0.35+st.depth*0.65);
+      ctx.save();
+      ctx.globalAlpha=alpha;
+      if(st.depth>0.55){ctx.shadowColor=c1;ctx.shadowBlur=10*s;}
+      const sg=ctx.createLinearGradient(st.sx-st.sw/2,0,st.sx+st.sw/2,0);
+      sg.addColorStop(0,c2);sg.addColorStop(0.45,c1);sg.addColorStop(1,c2);
+      ctx.fillStyle=sg;
+      ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(st.sx-st.sw/2,st.stickTopY,st.sw,st.stickH,3);
+      else ctx.rect(st.sx-st.sw/2,st.stickTopY,st.sw,st.stickH);
+      ctx.fill();
+      ctx.beginPath();ctx.arc(st.sx,st.stickTopY,st.sw/2+2*s,0,Math.PI*2);
+      ctx.fillStyle=st.depth>0.55?'rgba(255,255,255,0.95)':c1;ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  // Pass A: clip to ABOVE the rim top — sticks that poke out of the cylinder mouth
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0,0,W,rimY+ry-(ry-3*s)); // y < rimY + 3s  (just above the rim inner top)
+  ctx.clip();
+  _drawSticks(sticks);
+  ctx.restore();
+
+  // Pass B: clip to INSIDE the cylinder opening ellipse — sticks visible in the dark mouth
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(cx,rimY+ry,rx-7*s,ry-3*s,0,0,Math.PI*2);
+  ctx.clip();
+  _drawSticks(sticks);
+  ctx.restore();
+
+  // ---- 5. Top rim overlay ----
+  ctx.save();
+  const rimGrad=ctx.createLinearGradient(cx-rx,rimY+ry,cx+rx,rimY+ry);
+  rimGrad.addColorStop(0,'#2a0e03');
+  rimGrad.addColorStop(0.2,'#c07838');
+  rimGrad.addColorStop(0.5,'#d89030');
+  rimGrad.addColorStop(0.8,'#c07838');
+  rimGrad.addColorStop(1,'#1a0803');
+  ctx.strokeStyle=rimGrad;ctx.lineWidth=18*s;
+  ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=8*s;
+  ctx.beginPath();ctx.ellipse(cx,rimY+ry,rx,ry,0,0,Math.PI*2);ctx.stroke();
+  ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,210,100,0.5)';ctx.lineWidth=3*s;
+  ctx.beginPath();ctx.ellipse(cx,rimY+ry-2*s,rx-5*s,ry-3*s,0,Math.PI,0,true);ctx.stroke();
+  ctx.restore();
+
+  // ---- 6. Flying winner stick ----
+  if(strawWinner>=0&&(strawPhase==='flyout'||strawPhase==='done')){
+    const [c1,c2]=getColor(strawWinner);
+    const opt=options[strawWinner]||'';
+    const p=strawFlyProg;
+    const eased=1-Math.pow(1-p,3);
+
+    const winAngle=strawAngle+(strawWinner/n)*Math.PI*2;
+    const srcX=cx+Math.cos(winAngle)*sr;
+    const srcY=rimY+ry-45*s;
+    const tgtX=cx;
+    const tgtY=rimY-110*s;
+
+    const currX=srcX+(tgtX-srcX)*eased;
+    const currY=srcY+(tgtY-srcY)*eased;
+    const sw=14*s;
+
+    ctx.save();
+    ctx.globalAlpha=0.2+eased*0.8;
+    ctx.shadowColor=c1;ctx.shadowBlur=(16+eased*22)*s;
+
+    const trailGrad=ctx.createLinearGradient(currX-sw/2,currY,currX+sw/2,currY);
+    trailGrad.addColorStop(0,c2);trailGrad.addColorStop(0.5,c1);trailGrad.addColorStop(1,c2);
+    ctx.fillStyle=trailGrad;
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(currX-sw/2,currY,sw,130*s,6*s);
+    else ctx.rect(currX-sw/2,currY,sw,130*s);
+    ctx.fill();
+
+    ctx.beginPath();ctx.arc(currX,currY,sw/2+4*s,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.fill();
+
+    if(p>0.55){
+      const la=(p-0.55)/0.45;
+      ctx.globalAlpha=la;
+      const fs=Math.min(16*s,(220/opt.length+8)*s);
+      ctx.font=`bold ${Math.round(fs)}px Noto Sans TC`;
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillStyle='#fff';ctx.shadowColor=c1;ctx.shadowBlur=16*s;
+      const label=opt.length>12?opt.slice(0,11)+'…':opt;
+      ctx.fillText(label,currX,currY-10*s);
+    }
+    ctx.restore();
+
+    // Orbiting sparkles
+    if(strawPhase==='done'){
+      const t=Date.now()/500;
+      for(let i=0;i<6;i++){
+        const sa=t+i*(Math.PI/3);
+        const sr2=(32+Math.sin(t*2.5+i)*12)*s;
+        const spx=tgtX+Math.cos(sa)*sr2;
+        const spy=tgtY+sw+Math.sin(sa*1.4)*sr2*0.55;
+        ctx.save();
+        ctx.globalAlpha=0.5+Math.sin(t*3+i)*0.4;
+        ctx.fillStyle=getColor(i)[0];
+        ctx.shadowColor=getColor(i)[0];ctx.shadowBlur=8*s;
+        ctx.beginPath();ctx.arc(spx,spy,4*s,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  // Status hint
+  if(strawPhase==='spin'||strawPhase==='slowdown'){
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.font=`${Math.round(13*s)}px Noto Sans TC`;ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('搖晃籤筒中...',cx,H-12*s);
+    ctx.restore();
+  }
+}
+
+function startStraw(){
+  if((strawPhase!=='idle'&&strawPhase!=='done')||!options.length)return;
+  actionBlocked=true;
+  strawPhase='spin';
+  strawTimer=0;
+  strawSpinSpeed=0.16+Math.random()*0.08;
+  strawWinner=Math.floor(Math.random()*options.length);
+  strawFlyProg=0;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('resultBox').innerHTML='<span class="result-hint">搖晃中...</span>';
+
+  cancelAnimationFrame(strawRaf);
+  function frame(){
+    strawTimer++;
+    if(strawPhase==='spin'){
+      strawAngle+=strawSpinSpeed;
+      if(strawTimer>75){strawPhase='slowdown';strawTimer=0;}
+    } else if(strawPhase==='slowdown'){
+      strawSpinSpeed=Math.max(strawSpinSpeed*0.932,0.004);
+      strawAngle+=strawSpinSpeed;
+      if(strawSpinSpeed<=0.005){strawPhase='flyout';strawTimer=0;}
+    } else if(strawPhase==='flyout'){
+      strawAngle+=0.008; // gentle drift
+      strawFlyProg=Math.min(strawTimer/48,1);
+      if(strawFlyProg>=1){
+        strawPhase='done';
+        strawTimer=0;
+        actionBlocked=false;
+        document.getElementById('spinBtn').disabled=false;
+        showResult(options[strawWinner],'🎋');
+        if(removeAfterPick){
+          setTimeout(()=>{
+            const idx=strawWinner;
+            options.splice(idx,1);
+            strawWinner=-1;
+            strawPhase='idle';
+            renderOptionsList();
+            drawStraw();
+          },2200);
+          return; // stop RAF early
+        }
+      }
+    } else if(strawPhase==='done'){
+      if(strawTimer>240){strawPhase='idle';return;} // auto-idle after ~4s
+    }
+    drawStraw();
+    strawRaf=requestAnimationFrame(frame);
+  }
+  strawRaf=requestAnimationFrame(frame);
+}
+
+// =============================================
+// MODE SWITCH
+// =============================================
+function switchMode(m,pushHash){
+  if(pushHash!==false) location.hash=m;
+  mode=m;
+  actionBlocked=false;
+  cancelAnimationFrame(wheelRaf);
+  cancelAnimationFrame(strawRaf);
+  document.querySelectorAll('.mode-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['wheel','straw'][i]===m);
+  });
+  const optPanel=document.getElementById('optionsPanel');
+  const canvasEl=document.getElementById('mainCanvas');
+  document.getElementById('resultBox').innerHTML='<span class="result-hint">按下按鈕開始！</span>';
+  document.getElementById('spinBtn').disabled=false;
+
+  if(m==='wheel'){
+    optPanel.style.display='flex';
+    canvasEl.style.display='block';
+    document.getElementById('spinBtn').textContent='✨ 開始轉動！';
+    requestAnimationFrame(()=>{resizeMainCanvas();});
+  } else if(m==='straw'){
+    optPanel.style.display='flex';
+    canvasEl.style.display='block';
+    strawPhase='idle';strawWinner=-1;strawFlyProg=0;
+    document.getElementById('spinBtn').textContent='🎋 搖一搖！';
+    requestAnimationFrame(()=>{resizeMainCanvas();});
+  }
+}
+
+function doAction(){
+  if(mode==='wheel') spinWheel();
+  else if(mode==='straw') startStraw();
+}
+
+// =============================================
+// OPTIONS
+// =============================================
+function autoResizeTA(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,120)+'px';
+}
+function addOption(){
+  const inp=document.getElementById('optionInput');
+  const raw=inp.value;
+  // split by newline, filter empty lines
+  const items=raw.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+  if(!items.length)return;
+  items.forEach(v=>options.push(v));
+  inp.value='';
+  inp.style.height='auto';
+  renderOptionsList();
+  if(mode==='wheel')drawWheel();
+  else if(mode==='straw'){strawPhase='idle';strawWinner=-1;drawStraw();}
+}
+function removeOption(i){
+  options.splice(i,1);
+  renderOptionsList();
+  if(mode==='wheel')drawWheel();
+  else if(mode==='straw'){strawPhase='idle';strawWinner=-1;drawStraw();}
+}
+function clearOptions(){
+  options=[];renderOptionsList();
+  if(mode==='wheel')drawWheel();
+  else if(mode==='straw'){strawPhase='idle';drawStraw();}
+}
+function resetDefault(){
+  options=['牛肉麵','炒飯','麥當勞','滷味','便當','麵線','義大利麵'];
+  renderOptionsList();
+  if(mode==='wheel')drawWheel();
+  else if(mode==='straw'){strawPhase='idle';strawWinner=-1;drawStraw();}
+}
+function renderOptionsList(){
+  const list=document.getElementById('optionsList');
+  list.innerHTML='';
+  options.forEach((o,i)=>{
+    const [c1]=getColor(i);
+    const item=document.createElement('div');item.className='option-item';
+    const safeVal=o.replace(/"/g,'&quot;');
+    item.innerHTML=`
+      <div class="option-color" style="background:${c1}"></div>
+      <input class="option-name" value="${safeVal}" title="點擊編輯"
+        onblur="updateOption(${i},this.value)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+      <button class="option-del" onclick="removeOption(${i})">×</button>`;
+    list.appendChild(item);
+  });
+}
+function updateOption(i,val){
+  const v=val.trim();
+  if(v&&v!==options[i]){
+    options[i]=v;
+    if(mode==='wheel')drawWheel();
+    else if(mode==='straw'){strawPhase='idle';strawWinner=-1;drawStraw();}
+  }
+}
+function toggleRemove(){
+  removeAfterPick=!removeAfterPick;
+  document.getElementById('removeToggle').classList.toggle('on',removeAfterPick);
+}
+
+// =============================================
+// RESULT + CONFETTI
+// =============================================
+function showResult(winner,icon){
+  document.getElementById('resultBox').innerHTML=
+    `<span class="result-text" style="
+      background:linear-gradient(90deg,#f093fb,#f5576c,#fda085);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+      🎉 ${winner}</span>`;
+  addHistory(icon||'🎡', winner);
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const c=document.getElementById('confettiContainer');
+  const colors=['#f093fb','#f5576c','#fda085','#4facfe','#43e97b','#fee140','#fff'];
+  for(let i=0;i<45;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    const x=Math.random()*100;
+    const dur=1.8+Math.random()*1.8;
+    const delay=Math.random()*0.4;
+    const size=6+Math.random()*8;
+    p.style.cssText=`left:${x}%;background:${col};
+      width:${size}px;height:${size}px;
+      animation-duration:${dur}s;animation-delay:${delay}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'}`;
+    c.appendChild(p);
+    setTimeout(()=>p.remove(),(dur+delay)*1000+100);
+  }
+}
+
+// =============================================
+// THEME
+// =============================================
+function setTheme(t){
+  const isDark=(t==='neon'||t==='dark');
+  document.body.dataset.theme=isDark?'neon':'';
+  document.querySelectorAll('.nav-t-dot').forEach(d=>d.classList.remove('active'));
+  const dot=document.querySelector(isDark?'.td-dark':'.td-light');
+  if(dot)dot.classList.add('active');
+  localStorage.setItem('app-theme',isDark?'neon':'');
+}
+
+window.addEventListener('hashchange',function(){
+  const h=location.hash.replace('#','');
+  if(['wheel','straw'].includes(h))switchMode(h,false);
+});
+
+// =============================================
+// INIT
+// =============================================
+// =============================================
+// SWIPE-SPIN UTILITY
+// =============================================
+function addSwipeSpin(el,onDelta,pxPerStep){
+  if(!el)return;
+  pxPerStep=pxPerStep||8;
+  let y0=0,acc=0,on=false,drag=false;
+  el.addEventListener('touchstart',e=>{y0=e.touches[0].clientY;acc=0;on=true;drag=false;},{passive:true});
+  el.addEventListener('touchmove',e=>{
+    if(!on)return;const dy=y0-e.touches[0].clientY;
+    if(!drag&&Math.abs(dy)<6)return;drag=true;e.preventDefault();
+    const step=Math.round(dy/pxPerStep);const inc=step-acc;if(inc){onDelta(inc);acc=step;}
+  },{passive:false});
+  el.addEventListener('touchend',()=>{on=false;drag=false;});
+  el.addEventListener('mousedown',e=>{y0=e.clientY;acc=0;on=true;drag=false;e.preventDefault();});
+  window.addEventListener('mousemove',e=>{
+    if(!on)return;const dy=y0-e.clientY;
+    if(!drag&&Math.abs(dy)<4)return;drag=true;
+    const step=Math.round(dy/pxPerStep);const inc=step-acc;if(inc){onDelta(inc);acc=step;}
+  });
+  window.addEventListener('mouseup',()=>{on=false;drag=false;});
+}
+
+const saved=localStorage.getItem('app-theme')||'';
+setTheme(saved);
+renderOptionsList();
+setTimeout(()=>{
+  resizeMainCanvas();
+  const h=location.hash.replace('#','');
+  switchMode(['wheel','straw'].includes(h)?h:'wheel',false);
+},50);
+</script>
+</body>
+</html>

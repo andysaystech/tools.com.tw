@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>匯率</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#eef8ef;--surface:#fff;--surface2:#eef8ef;
+  --t1:#1C1C1E;--t2:#8E8E93;--t3:#C7C7CC;
+  --sep:rgba(60,60,67,0.12);
+  --blue:#007AFF;--green:#34C759;--red:#FF3B30;
+  --orange:#FF9500;--purple:#AF52DE;--pink:#FF375F;
+  --shadow:0 2px 20px rgba(0,0,0,0.08);
+  --tab-h:58px;
+}
+[data-theme="neumorphism"]{
+  --bg:#E8E8EE;--surface:#EFEFF5;--surface2:#E2E2EA;
+  --t1:#2c2c3e;--t2:#6a6a8a;--t3:#b0b0c8;
+  --sep:rgba(44,44,62,0.1);
+  --blue:#7c6af7;--green:#38b8a5;--red:#e05555;
+  --orange:#d4882a;--purple:#9a6cdf;
+  --shadow:6px 6px 18px #c8c8d0,-6px -6px 18px #fff;
+}
+[data-theme="neon"]{
+  --bg:#080818;--surface:#0e0e24;--surface2:#141430;
+  --t1:#fff;--t2:rgba(200,200,255,0.55);--t3:rgba(200,200,255,0.2);
+  --sep:rgba(100,100,255,0.15);
+  --blue:#3d8eff;--green:#30D158;--red:#FF453A;
+  --orange:#FF9F0A;--shadow:0 2px 20px rgba(0,0,0,0.6);
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Noto Sans TC',sans-serif;
+  background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;
+}
+
+/* ── TAB BAR ── */
+.app-tabs{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  display:flex;height:var(--tab-h);align-items:center;
+  background:rgba(255,255,255,0.98);
+  backdrop-filter:saturate(180%) blur(40px);
+  -webkit-backdrop-filter:saturate(180%) blur(40px);
+  border-bottom:.5px solid var(--sep);
+}
+[data-theme="neon"] .app-tabs{background:rgba(44,44,46,0.96);border-bottom-color:rgba(255,255,255,0.10)}
+.app-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;text-decoration:none;
+  color:var(--t2);font-size:.55rem;font-weight:500;
+  transition:color .15s;padding:4px 2px;
+}
+.app-tab .ti{font-size:1.2rem;line-height:1.1}
+.app-tab.active{color:var(--blue)}
+.app-tab:active{opacity:.6}
+.nav-theme{display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;flex-shrink:0}
+.nav-t-dot{width:17px;height:17px;border-radius:50%;cursor:pointer;transition:transform .2s,box-shadow .2s;flex-shrink:0;
+  box-shadow:0 0 0 1.5px rgba(128,128,128,0.25)}
+.nav-t-dot:hover{transform:scale(1.15)}
+.nav-t-dot.active{transform:scale(1.18);box-shadow:0 0 0 2.5px rgba(255,255,255,0.9),0 0 0 1.5px rgba(0,0,0,0.2)}
+.td-light{background:linear-gradient(135deg,#fff,#e0e0e0)}
+.td-dark{background:linear-gradient(135deg,#0a0818,#1a1a48)}
+
+/* ── CONTENT ── */
+.content{
+  position:fixed;top:var(--tab-h);left:0;right:0;bottom:0;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* ── HEADER ── */
+.fx-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 6px;flex-shrink:0;
+}
+.fx-title{font-size:1.05rem;font-weight:700}
+.fx-updated{font-size:.72rem;color:var(--t2);display:flex;align-items:center;gap:5px}
+.fx-spin{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--sep);border-top-color:var(--blue);
+  animation:spin .8s linear infinite;display:none;
+}
+.fx-spin.show{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fx-err{
+  display:none;font-size:.7rem;color:var(--red);
+  background:rgba(255,59,48,.08);padding:3px 8px;border-radius:8px;
+}
+.fx-err.show{display:inline-block}
+
+/* ── CONVERTER CARD ── */
+.converter-card{
+  margin:0 12px 10px;
+  background:var(--surface);border-radius:20px;
+  box-shadow:var(--shadow);padding:16px;
+  display:flex;flex-direction:column;gap:12px;flex-shrink:0;
+}
+/* Currency selectors row */
+.conv-currencies{display:flex;align-items:center;gap:10px}
+.conv-from-wrap,.conv-to-wrap2{flex:1;display:flex;flex-direction:column;gap:4px}
+.conv-label{font-size:.62rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;padding:0 4px}
+.conv-select{
+  width:100%;
+  background:var(--surface2);border:none;outline:none;
+  color:var(--t1);font-family:inherit;font-size:.88rem;font-weight:700;
+  padding:8px 10px;border-radius:12px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;text-align:center;
+}
+.conv-select option{background:var(--surface);color:var(--t1)}
+/* Swap button — prominent, centred between currencies */
+.swap-btn{
+  width:52px;height:52px;flex-shrink:0;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#34C759,#28a745);
+  color:#fff;font-size:1.7rem;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 18px rgba(40,167,69,.45);
+  transition:transform .35s,box-shadow .2s;
+  line-height:1;
+}
+.swap-btn:hover{box-shadow:0 6px 26px rgba(40,167,69,.65);transform:scale(1.1)}
+.swap-btn:active{transform:scaleX(-1) scale(.9)}
+/* Amounts row */
+.conv-amounts{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg,var(--surface2));border-radius:14px;padding:10px 14px;
+}
+.conv-amount{
+  flex:1;font-size:clamp(1.5rem,5.5vw,2.2rem);font-weight:800;
+  background:transparent;border:none;outline:none;
+  color:var(--t1);font-family:'Inter',-apple-system,sans-serif;
+  font-variant-numeric:tabular-nums;min-width:0;
+  caret-color:var(--blue);cursor:default;
+}
+.conv-arrow{color:var(--t2);font-size:1.1rem;flex-shrink:0}
+.conv-result{
+  flex:1;text-align:right;
+  font-size:clamp(1.5rem,5.5vw,2.2rem);font-weight:800;
+  font-family:'Inter',-apple-system,sans-serif;font-variant-numeric:tabular-nums;
+  color:#FF3B30;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+/* Keypad */
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kp-btn{
+  height:52px;border:none;border-radius:14px;
+  background:var(--surface2);color:var(--t1);
+  font-size:1.25rem;font-weight:600;cursor:pointer;
+  font-family:'Inter',-apple-system,sans-serif;
+  transition:all .12s;box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
+.kp-btn:active{transform:scale(.91);background:var(--blue);color:#fff;box-shadow:none}
+.kp-del{background:rgba(255,59,48,.1);color:#FF3B30}
+.kp-del:active{background:#FF3B30!important;color:#fff!important}
+.kp-ac{background:rgba(255,149,0,.12);color:#FF9500;font-size:1rem!important;font-weight:700!important}
+.kp-ac:active{background:#FF9500!important;color:#fff!important}
+
+/* ── RATE TABLE ── */
+.rate-section{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:0 12px 12px;
+}
+.rate-base-row{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 4px 8px;
+}
+.rate-base-lbl{font-size:.78rem;color:var(--t2)}
+.base-sel{
+  background:var(--surface);border:none;outline:none;
+  color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:700;
+  padding:5px 10px;border-radius:10px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  box-shadow:var(--shadow);
+}
+.rate-list{display:flex;flex-direction:column;gap:6px}
+.rate-item{
+  background:var(--surface);border-radius:14px;
+  box-shadow:var(--shadow);
+  display:flex;align-items:center;padding:10px 14px;gap:12px;
+  cursor:pointer;transition:all .15s;
+}
+.rate-item:active{transform:scale(.98);opacity:.85}
+.rate-flag{font-size:1.4rem;flex-shrink:0;line-height:1}
+.rate-info{flex:1;min-width:0}
+.rate-name{font-size:.82rem;font-weight:700;color:var(--t1)}
+.rate-code{font-size:.68rem;color:var(--t2)}
+.rate-val{text-align:right;flex-shrink:0}
+.rate-num{font-size:.98rem;font-weight:800;font-family:'Inter',sans-serif;font-variant-numeric:tabular-nums;color:var(--t1)}
+.rate-sub{font-size:.65rem;color:var(--t2);margin-top:1px;text-align:right}
+</style>
+</head>
+<body>
+
+<nav class="app-tabs">
+  <a href="index.html" class="app-tab"><span class="ti">🏠</span><span>首頁</span></a>
+  <a href="lucky-draw.html" class="app-tab"><span class="ti">🎡</span><span>抽抽樂</span></a>
+  <a href="numbers.html" class="app-tab"><span class="ti">🎱</span><span>抽數字</span></a>
+  <a href="score-counter.html" class="app-tab"><span class="ti">🏆</span><span>計數</span></a>
+  <a href="pomodoro.html" class="app-tab"><span class="ti">🌱</span><span>時間</span></a>
+  <a href="currency.html" class="app-tab active"><span class="ti">💱</span><span>匯率</span></a>
+  <a href="todo.html" class="app-tab"><span class="ti">✅</span><span>待辦</span></a>
+
+  <div class="nav-theme">
+    <div class="nav-t-dot td-light" onclick="setTheme('')" title="淺色"></div>
+    <div class="nav-t-dot td-dark" onclick="setTheme('neon')" title="深色"></div>
+  </div>
+</nav>
+
+<div class="content">
+  <!-- Header -->
+  <div class="fx-header">
+    <div class="fx-title">匯率轉換</div>
+    <div class="fx-updated">
+      <span class="fx-spin" id="fxSpin"></span>
+      <span class="fx-err" id="fxErr">⚠ 載入失敗</span>
+      <span id="fxTime"></span>
+    </div>
+  </div>
+
+  <!-- Converter -->
+  <div class="converter-card">
+    <!-- Currency selectors + swap -->
+    <div class="conv-currencies">
+      <div class="conv-from-wrap">
+        <div class="conv-label">從</div>
+        <select class="conv-select" id="selFrom" onchange="calc()"></select>
+      </div>
+      <button class="swap-btn" onclick="swapCurrencies()" title="互換">⇄</button>
+      <div class="conv-to-wrap2">
+        <div class="conv-label">換</div>
+        <select class="conv-select" id="selTo" onchange="calc()"></select>
+      </div>
+    </div>
+    <!-- Amount & result -->
+    <div class="conv-amounts">
+      <input class="conv-amount" id="amtFrom" type="text" inputmode="none"
+             value="1" placeholder="0" readonly>
+      <div class="conv-arrow">→</div>
+      <div class="conv-result" id="resultDisp">—</div>
+    </div>
+    <!-- Numeric keypad -->
+    <div class="keypad">
+      <button class="kp-btn" onclick="kpInput('7')">7</button>
+      <button class="kp-btn" onclick="kpInput('8')">8</button>
+      <button class="kp-btn" onclick="kpInput('9')">9</button>
+      <button class="kp-btn" onclick="kpInput('4')">4</button>
+      <button class="kp-btn" onclick="kpInput('5')">5</button>
+      <button class="kp-btn" onclick="kpInput('6')">6</button>
+      <button class="kp-btn" onclick="kpInput('1')">1</button>
+      <button class="kp-btn" onclick="kpInput('2')">2</button>
+      <button class="kp-btn" onclick="kpInput('3')">3</button>
+      <button class="kp-btn" onclick="kpInput('.')">.</button>
+      <button class="kp-btn" onclick="kpInput('0')">0</button>
+      <button class="kp-btn kp-del" onclick="kpInput('⌫')">⌫</button>
+      <button class="kp-btn kp-ac" onclick="kpInput('AC')" style="grid-column:1/-1">AC(全清) </button>
+    </div>
+  </div>
+
+  <!-- Rate reference table -->
+  <div class="rate-section">
+    <div class="rate-base-row">
+      <span class="rate-base-lbl">基準貨幣</span>
+      <select class="base-sel" id="baseSel" onchange="renderTable()"></select>
+    </div>
+    <div class="rate-list" id="rateList"></div>
+  </div>
+</div>
+
+<script>
+// ── Theme ──
+function setTheme(t){
+  const isDark=(t==='neon'||t==='neumorphism'||t==='dark');
+  const theme=isDark?'neon':'';
+  document.body.dataset.theme=theme;
+  localStorage.setItem('app-theme',theme);
+  document.querySelectorAll('.nav-t-dot').forEach(d=>d.classList.remove('active'));
+  const dot=document.querySelector(isDark?'.td-dark':'.td-light');
+  if(dot)dot.classList.add('active');
+}
+(function(){
+  const t=localStorage.getItem('app-theme')||'';
+  setTheme(t);
+})();
+
+// ── Currencies ──
+const CURRENCIES=[
+  {code:'TWD',name:'新台幣',flag:'🇹🇼'},
+  {code:'USD',name:'美元',flag:'🇺🇸'},
+  {code:'EUR',name:'歐元',flag:'🇪🇺'},
+  {code:'JPY',name:'日圓',flag:'🇯🇵'},
+  {code:'GBP',name:'英鎊',flag:'🇬🇧'},
+  {code:'CNY',name:'人民幣',flag:'🇨🇳'},
+  {code:'HKD',name:'港幣',flag:'🇭🇰'},
+  {code:'KRW',name:'韓元',flag:'🇰🇷'},
+  {code:'SGD',name:'新加坡幣',flag:'🇸🇬'},
+  {code:'AUD',name:'澳幣',flag:'🇦🇺'},
+  {code:'CAD',name:'加幣',flag:'🇨🇦'},
+  {code:'CHF',name:'瑞士法郎',flag:'🇨🇭'},
+  {code:'THB',name:'泰銖',flag:'🇹🇭'},
+  {code:'MYR',name:'馬幣',flag:'🇲🇾'},
+  {code:'VND',name:'越南盾',flag:'🇻🇳'},
+  {code:'IDR',name:'印尼盾',flag:'🇮🇩'},
+  {code:'PHP',name:'菲律賓披索',flag:'🇵🇭'},
+  {code:'INR',name:'印度盧比',flag:'🇮🇳'},
+  {code:'TRY',name:'土耳其里拉',flag:'🇹🇷'},
+  {code:'SAR',name:'沙烏地里亞爾',flag:'🇸🇦'},
+];
+
+// rates stored as: rates[code] = how many CODE per 1 TWD
+let ratesFromTWD={TWD:1};
+let lastUpdatedMs=0;
+
+// ── Build selects ──
+function buildSelects(){
+  const opts=CURRENCIES.map(c=>`<option value="${c.code}">${c.flag} ${c.code} ${c.name}</option>`).join('');
+  document.getElementById('selFrom').innerHTML=opts;
+  document.getElementById('selTo').innerHTML=opts;
+  document.getElementById('baseSel').innerHTML=opts;
+  document.getElementById('selFrom').value='TWD';
+  document.getElementById('selTo').value='USD';
+  document.getElementById('baseSel').value='TWD';
+}
+
+// ── Fetch ──
+async function fetchRates(){
+  const spin=document.getElementById('fxSpin');
+  const errEl=document.getElementById('fxErr');
+  spin.classList.add('show');
+  errEl.classList.remove('show');
+
+  // Check cache (< 60 min)
+  try{
+    const cached=localStorage.getItem('fx-rates-v2');
+    const cachedTs=Number(localStorage.getItem('fx-rates-ts')||0);
+    if(cached&&Date.now()-cachedTs<3_600_000){
+      ratesFromTWD=JSON.parse(cached);
+      lastUpdatedMs=cachedTs;
+      spin.classList.remove('show');
+      renderAll();
+      // still refresh in background
+    }
+  }catch(e){}
+
+  try{
+    // primary: open.er-api.com — free, no key required
+    const res=await fetch('https://open.er-api.com/v6/latest/TWD');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(data.result!=='success') throw new Error('bad result');
+
+    ratesFromTWD={...data.rates,TWD:1};
+    lastUpdatedMs=Date.now();
+    localStorage.setItem('fx-rates-v2',JSON.stringify(ratesFromTWD));
+    localStorage.setItem('fx-rates-ts',String(lastUpdatedMs));
+    spin.classList.remove('show');
+    renderAll();
+  }catch(primaryErr){
+    // fallback: frankfurter (TWD might not be base — use USD, then cross-rate)
+    try{
+      const r2=await fetch('https://api.frankfurter.app/latest?from=USD');
+      if(!r2.ok) throw new Error('ff HTTP '+r2.status);
+      const d2=await r2.json();
+      // d2.rates has X per 1 USD; also d2.rates.USD missing, add it
+      const usdRates={...d2.rates,USD:1};
+      // cross rate: TWD per USD
+      const twdPerUsd=usdRates.TWD||31;
+      // convert all to "per TWD"
+      const newRates={TWD:1};
+      for(const [k,v] of Object.entries(usdRates)){
+        newRates[k]=v/twdPerUsd;
+      }
+      ratesFromTWD=newRates;
+      lastUpdatedMs=Date.now();
+      localStorage.setItem('fx-rates-v2',JSON.stringify(ratesFromTWD));
+      localStorage.setItem('fx-rates-ts',String(lastUpdatedMs));
+      spin.classList.remove('show');
+      renderAll();
+    }catch(fallbackErr){
+      spin.classList.remove('show');
+      // use cached if available, else show error
+      const cached=localStorage.getItem('fx-rates-v2');
+      if(cached){
+        ratesFromTWD=JSON.parse(cached);
+        lastUpdatedMs=Number(localStorage.getItem('fx-rates-ts')||0);
+        renderAll();
+      }else{
+        errEl.classList.add('show');
+      }
+    }
+  }
+}
+
+// ── Conversion helpers ──
+function convert(amount,from,to){
+  if(!ratesFromTWD[from]||!ratesFromTWD[to]) return null;
+  // from → TWD → to
+  const inTWD=amount/ratesFromTWD[from];
+  return inTWD*ratesFromTWD[to];
+}
+
+function fmtAmt(amount,code){
+  if(amount===null) return '—';
+  const big=['VND','IDR','KRW'].includes(code);
+  const tiny=amount<0.01&&amount>0;
+  if(big) return Math.round(amount).toLocaleString('zh-TW');
+  if(tiny) return amount.toFixed(6);
+  if(amount>=10000) return amount.toLocaleString('zh-TW',{maximumFractionDigits:2});
+  return amount.toFixed(2);
+}
+
+// ── Render ──
+function renderAll(){
+  updateTimestamp();
+  calc();
+  renderTable();
+}
+
+function updateTimestamp(){
+  const el=document.getElementById('fxTime');
+  if(!lastUpdatedMs){el.textContent='';return;}
+  const d=new Date(lastUpdatedMs);
+  el.textContent=`更新於 ${d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+function kpInput(v){
+  const el=document.getElementById('amtFrom');
+  let cur=el.value;
+  if(v==='AC'){
+    el.value='0';
+  }else if(v==='⌫'){
+    el.value=cur.slice(0,-1)||'0';
+  }else if(v==='.'){
+    if(!cur.includes('.'))el.value=(cur||'0')+'.';
+  }else{
+    if(cur==='0'||cur==='')el.value=v;
+    else el.value=cur+v;
+  }
+  calc();
+}
+
+function calc(){
+  const amt=parseFloat(document.getElementById('amtFrom').value)||0;
+  const from=document.getElementById('selFrom').value;
+  const to=document.getElementById('selTo').value;
+  const result=convert(amt,from,to);
+  document.getElementById('resultDisp').textContent=fmtAmt(result,to);
+}
+
+function swapCurrencies(){
+  const sf=document.getElementById('selFrom');
+  const st=document.getElementById('selTo');
+  const af=document.getElementById('amtFrom');
+  const res=document.getElementById('resultDisp').textContent;
+  [sf.value,st.value]=[st.value,sf.value];
+  const num=parseFloat(res.replace(/,/g,''));
+  if(!isNaN(num)&&isFinite(num))af.value=String(parseFloat(num.toFixed(6)));
+  calc();
+}
+
+function renderTable(){
+  const base=document.getElementById('baseSel').value;
+  const list=document.getElementById('rateList');
+  const rows=CURRENCIES.filter(c=>c.code!==base);
+  list.innerHTML=rows.map(c=>{
+    const rate=convert(1,base,c.code);
+    const inv=convert(1,c.code,base);
+    return`<div class="rate-item" onclick="quickFill('${base}','${c.code}')">
+      <span class="rate-flag">${c.flag}</span>
+      <div class="rate-info">
+        <div class="rate-name">${c.name}</div>
+        <div class="rate-code">${c.code}</div>
+      </div>
+      <div class="rate-val">
+        <div class="rate-num">1 ${base} = ${fmtAmt(rate,c.code)} ${c.code}</div>
+        <div class="rate-sub">1 ${c.code} = ${fmtAmt(inv,base)} ${base}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickFill(from,to){
+  document.getElementById('selFrom').value=from;
+  document.getElementById('selTo').value=to;
+  document.getElementById('amtFrom').value='1';
+  calc();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Init ──
+buildSelects();
+fetchRates();
+</script>
+</body>
+</html>
