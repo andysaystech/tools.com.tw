@@ -494,8 +494,8 @@ body[data-theme=""] .hist-head-title{color:var(--text)}
       </div>
       <div class="dice-area" id="diceArea"></div>
     </div>
-    <div class="result-box" id="diceResult"><span style="color:var(--text2)">按下按鈕開始擲！</span></div>
     <button class="action-btn" id="diceBtn" onclick="rollDice()">🎲 開始擲！</button>
+    <div class="result-box" id="diceResult"><span style="color:var(--text2)">按下按鈕開始擲！</span></div>
   </div>
 
   <!-- ══ BALL MACHINE ══ -->
@@ -516,6 +516,7 @@ body[data-theme=""] .hist-head-title{color:var(--text)}
         </div>
       </div>
     </div>
+    <button class="action-btn" id="ballBtn" onclick="drawBall()">🎱 開始抽！</button>
     <div class="glass-card">
       <div class="section-title">數字範圍</div>
       <div class="ball-range-row">
@@ -541,7 +542,6 @@ body[data-theme=""] .hist-head-title{color:var(--text)}
         <button onclick="clearBallExcluded()" style="margin-top:8px;padding:5px 14px;border-radius:20px;border:1px solid var(--glass-border);background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;cursor:pointer">清除排除</button>
       </div>
     </div>
-    <button class="action-btn" id="ballBtn" onclick="drawBall()">🎱 開始抽！</button>
   </div>
 
   <!-- ══ PLAYING CARDS ══ -->
@@ -591,7 +591,10 @@ body[data-theme=""] .hist-head-title{color:var(--text)}
           <div class="slot-win-msg" id="slotWinMsg"></div>
         </div>
       </div>
-      <div style="margin-top:12px">
+    </div>
+    <button class="action-btn" id="slotBtn" onclick="spinSlot()">🎰 拉霸！</button>
+    <div class="glass-card">
+      <div style="margin-top:0">
         <div class="toggle-row">
           <span class="toggle-label">抽中後排除</span>
           <button class="toggle" id="slotAutoExcToggle" onclick="toggleSlotExclude()"></button>
@@ -603,7 +606,6 @@ body[data-theme=""] .hist-head-title{color:var(--text)}
       </div>
       <div class="ball-remaining" id="slotRemaining" style="margin-top:6px"></div>
     </div>
-    <button class="action-btn" id="slotBtn" onclick="spinSlot()">🎰 拉霸！</button>
   </div>
 
 </div>
