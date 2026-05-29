@@ -1,0 +1,367 @@
+/* ═══════════════════════════════════════════════════
+   Andy百寶箱 — Unified Design System (Apple-like)
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --tab-h: 58px;
+  --sub-h: 62px;
+  --content-max: 720px;
+  --radius: 20px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Noto Sans TC', sans-serif;
+
+  --fs-tab: 0.55rem;
+  --fs-sm: 0.78rem;
+  --fs-base: 0.92rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.05rem;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Light */
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --surface2: #ffffff;
+  --text: #1c1c1e;
+  --text2: #8e8e93;
+  --text3: #c7c7cc;
+  --sep: rgba(60, 60, 67, 0.12);
+  --nav-bg: rgba(255, 255, 255, 0.98);
+  --nav-border: rgba(0, 0, 0, 0.08);
+  --tab-inactive: #8e8e93;
+  --accent: #007aff;
+  --accent-hover: #0056b3;
+  --accent-green: #34c759;
+  --accent-red: #ff3b30;
+  --glass: rgba(255, 255, 255, 0.96);
+  --glass-border: rgba(60, 60, 67, 0.12);
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --toggle-off: #e5e5ea;
+  --toggle-on: #34c759;
+}
+
+[data-theme="dark"],
+[data-theme="neon"] {
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface2: #2c2c2e;
+  --text: #ffffff;
+  --text2: rgba(235, 235, 245, 0.60);
+  --text3: rgba(235, 235, 245, 0.30);
+  --sep: rgba(255, 255, 255, 0.12);
+  --nav-bg: rgba(44, 44, 46, 0.96);
+  --nav-border: rgba(255, 255, 255, 0.10);
+  --tab-inactive: rgba(235, 235, 245, 0.45);
+  --accent: #0a84ff;
+  --accent-hover: #409cff;
+  --accent-green: #30d158;
+  --accent-red: #ff453a;
+  --glass: rgba(28, 28, 30, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --toggle-off: rgba(120, 120, 128, 0.32);
+  --toggle-on: #30d158;
+}
+
+/* ── Base ── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── Top Nav (app-tabs & tab-bar) ── */
+.app-tabs,
+.tab-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  height: var(--tab-h);
+  align-items: center;
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(40px);
+  -webkit-backdrop-filter: saturate(180%) blur(40px);
+  border-bottom: 0.5px solid var(--nav-border);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.app-tab,
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--tab-inactive);
+  gap: 2px;
+  font-family: var(--font);
+  font-size: var(--fs-tab);
+  font-weight: var(--fw-medium);
+  transition: color 0.15s;
+  padding: 4px 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-tab .ti,
+.tab-item .ti {
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.app-tab.active,
+.tab-item.active {
+  color: var(--accent);
+}
+
+.app-tab:active,
+.tab-item:active {
+  opacity: 0.6;
+}
+
+/* ── Theme dots ── */
+.nav-theme {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px 0 4px;
+  flex-shrink: 0;
+}
+
+.nav-t-dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1.5px rgba(128, 128, 128, 0.28);
+}
+
+.nav-t-dot:hover {
+  transform: scale(1.15);
+}
+
+.nav-t-dot.active {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 2.5px var(--text), 0 0 0 1.5px rgba(128, 128, 128, 0.25);
+}
+
+.td-light {
+  background: linear-gradient(135deg, #ffffff, #e5e5ea);
+}
+
+.td-dark {
+  background: linear-gradient(135deg, #2c2c2e, #1c1c1e);
+}
+
+/* ── Sub-function pill buttons ── */
+.mode-btn,
+.sub-tab,
+.seg-btn,
+.mode-pill,
+.pomo-tab {
+  padding: 9px 22px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  background: var(--surface);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  line-height: 1.35;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mode-btn.active,
+.sub-tab.active,
+.seg-btn.active,
+.mode-pill.active,
+.pomo-tab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .mode-btn.active,
+[data-theme="dark"] .sub-tab.active,
+[data-theme="dark"] .seg-btn.active,
+[data-theme="dark"] .mode-pill.active,
+[data-theme="dark"] .pomo-tab.active,
+[data-theme="neon"] .mode-btn.active,
+[data-theme="neon"] .sub-tab.active,
+[data-theme="neon"] .seg-btn.active,
+[data-theme="neon"] .mode-pill.active,
+[data-theme="neon"] .pomo-tab.active {
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.35);
+}
+
+/* ── Cards / panels ── */
+.glass-card,
+.panel,
+.canvas-panel,
+.history-panel {
+  background: var(--surface);
+  border: 0.5px solid var(--sep);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.section-title,
+.panel h3,
+.history-panel h3 {
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Primary action button ── */
+.action-btn,
+.spin-btn,
+.btn-add-task {
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
+}
+
+.action-btn:hover,
+.spin-btn:hover,
+.btn-add-task:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(0, 122, 255, 0.32);
+}
+
+.action-btn:active,
+.spin-btn:active,
+.btn-add-task:active {
+  transform: scale(0.98);
+}
+
+/* ── Toggle switch (visible in both modes) ── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.toggle-label {
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  color: var(--text);
+}
+
+.toggle {
+  width: 51px;
+  height: 31px;
+  border-radius: 16px;
+  border: none;
+  background: var(--toggle-off);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.25s;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.toggle.on {
+  background: var(--toggle-on);
+  box-shadow: none;
+}
+
+.toggle.on::after {
+  transform: translateX(20px);
+}
+
+[data-theme="dark"] .toggle,
+[data-theme="neon"] .toggle {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* ── Sub-tabs bar ── */
+.sub-tabs {
+  position: fixed;
+  top: var(--tab-h);
+  left: 0;
+  right: 0;
+  z-index: 150;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  background: var(--nav-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 0.5px solid var(--nav-border);
+  padding: 10px 16px;
+  height: var(--sub-h);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.sub-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sub-tab {
+  flex-shrink: 0;
+  backdrop-filter: none;
+}
+
+/* ── Content wrapper ── */
+.page-content,
+.content-wrap {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}

@@ -4,62 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Andy百寶箱</title>
+<link rel="stylesheet" href="theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#eef8ef;--surface:#fff;--surface2:rgba(255,255,255,0.6);
-  --t1:#1C1C1E;--t2:#6E6E73;--t3:#C7C7CC;
-  --sep:rgba(60,60,67,0.12);
-  --blue:#007AFF;--radius:20px;
-  --tab-h:58px;
-}
-/* dark mode */
-[data-theme="dark"]{
-  --bg:#080818;--surface:#0e0e24;--surface2:rgba(14,14,36,0.7);
-  --t1:#fff;--t2:rgba(200,200,255,0.55);--t3:rgba(200,200,255,0.2);
-  --sep:rgba(100,100,255,0.15);--blue:#3d8eff;--radius:20px;
-}
-[data-theme="dark"] body{background:#080818}
-[data-theme="dark"] .app-tabs{background:rgba(44,44,46,0.96);border-bottom-color:rgba(255,255,255,0.10)}
-[data-theme="dark"] .app-tab.active{color:#3d8eff}
+:root{--radius:20px}
 [data-theme="dark"] .tool-card{
-  background:#0e0e24;border-color:rgba(100,100,255,0.18);
-  box-shadow:0 2px 20px rgba(60,60,200,.25);
+  box-shadow:var(--shadow);
 }
-[data-theme="dark"] .tool-card:hover{box-shadow:0 8px 32px rgba(60,80,255,.4)}
+[data-theme="dark"] .tool-card:hover{box-shadow:var(--shadow-lg)}
 html,body{min-height:100%;-webkit-font-smoothing:antialiased}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Noto Sans TC',sans-serif;
-  background:var(--bg);color:var(--t1);transition:background .3s,color .3s;
+  font-family:var(--font);
+  background:var(--bg);color:var(--text);transition:background .3s,color .3s;
 }
-
-/* ─── TAB BAR ─── */
-.app-tabs{
-  position:fixed;top:0;left:0;right:0;z-index:999;
-  display:flex;height:var(--tab-h);align-items:center;
-  background:rgba(255,255,255,0.98);
-  backdrop-filter:saturate(180%) blur(40px);
-  -webkit-backdrop-filter:saturate(180%) blur(40px);
-  border-bottom:.5px solid var(--sep);
-}
-[data-theme="dark"] .app-tabs{background:rgba(44,44,46,0.96);border-bottom-color:rgba(255,255,255,0.10)}
-/* ─── NAV THEME DOTS ─── */
-.nav-theme{display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;flex-shrink:0}
-.nav-t-dot{width:17px;height:17px;border-radius:50%;cursor:pointer;transition:transform .2s,box-shadow .2s;flex-shrink:0;
-  box-shadow:0 0 0 1.5px rgba(128,128,128,0.25)}
-.nav-t-dot:hover{transform:scale(1.15)}
-.nav-t-dot.active{transform:scale(1.18);box-shadow:0 0 0 2.5px rgba(255,255,255,0.9),0 0 0 1.5px rgba(0,0,0,0.2)}
-.app-tab{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-decoration:none;color:var(--t2);gap:2px;
-  font-size:.55rem;font-weight:500;letter-spacing:.01em;
-  transition:color .15s;-webkit-tap-highlight-color:transparent;
-  padding:4px 0;
-}
-.app-tab .ti{font-size:1.35rem;line-height:1.1}
-.app-tab.active{color:var(--blue)}
-.app-tab:active{opacity:.6}
 
 /* ─── CONTENT ─── */
 html,body{height:100%}
@@ -77,9 +35,9 @@ html,body{height:100%}
 }
 .hero-title{
   font-size:clamp(1.3rem,4vw,2rem);font-weight:900;line-height:1.1;
-  letter-spacing:-.025em;color:var(--t1);
+  letter-spacing:-.025em;color:var(--text);
 }
-.hero-sub{font-size:clamp(.72rem,1.6vw,.88rem);color:var(--t2);margin-top:3px}
+.hero-sub{font-size:clamp(.72rem,1.6vw,.88rem);color:var(--text2);margin-top:3px}
 
 /* ─── THEME TOGGLE ─── */
 .theme-toggle{display:flex;gap:8px;align-items:center;flex-shrink:0}
@@ -108,7 +66,7 @@ html,body{height:100%}
   background:var(--surface);border-radius:var(--radius);
   padding:clamp(14px,3.5vw,26px) clamp(12px,3vw,20px) clamp(16px,3.5vw,26px);
   text-decoration:none;color:inherit;text-align:center;
-  box-shadow:0 2px 16px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.03);
+  box-shadow:var(--shadow);
   transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;
   -webkit-tap-highlight-color:transparent;
   border:.5px solid var(--sep);
@@ -134,11 +92,11 @@ html,body{height:100%}
 
 .card-body{flex:1;min-width:0}
 .card-title{font-size:clamp(.82rem,2.2vw,1.1rem);font-weight:700;letter-spacing:-.01em;margin-bottom:clamp(3px,0.8vw,7px)}
-.card-desc{font-size:clamp(.62rem,1.5vw,.8rem);color:var(--t2);line-height:1.55}
+.card-desc{font-size:clamp(.62rem,1.5vw,.8rem);color:var(--text2);line-height:1.55}
 
 .card-arrow{
   position:absolute;bottom:clamp(10px,2vw,16px);right:clamp(12px,2.5vw,18px);
-  color:var(--t3);font-size:clamp(.9rem,2vw,1.2rem);transition:transform .2s;
+  color:var(--text3);font-size:clamp(.9rem,2vw,1.2rem);transition:transform .2s;
 }
 .tool-card:hover .card-arrow{transform:translate(3px,-2px)}
 </style>
@@ -230,7 +188,7 @@ html,body{height:100%}
 
 <script>
 function setTheme(t){
-  const isDark=(t==='dark'||t==='neon'||t==='neumorphism');
+  const isDark=(t==='dark'||t==='neon');
   const theme=isDark?'dark':'';
   document.body.dataset.theme=theme;
   document.querySelectorAll('.nav-t-dot').forEach(d=>d.classList.remove('active'));
@@ -239,7 +197,7 @@ function setTheme(t){
   localStorage.setItem('app-theme',theme);
 }
 const saved=localStorage.getItem('app-theme')||'';
-setTheme(saved);
+setTheme(saved==='neon'?'dark':saved);
 </script>
 </body>
 </html>

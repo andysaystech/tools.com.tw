@@ -4,162 +4,75 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>抽數字 ✦ 互動工具箱</title>
+<link rel="stylesheet" href="theme.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg1:#1a1a2e;--bg2:#16213e;
-  --glass:rgba(255,255,255,0.08);
-  --glass-border:rgba(255,255,255,0.18);
-  --text:#fff;--text2:rgba(255,255,255,0.65);
-  --accent:#a78bfa;--accent2:#7c3aed;
-  --radius:20px;
-  --tab-h:58px;
-}
+:root{--radius:20px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:'Noto Sans TC',sans-serif;min-height:100vh;
-  background:linear-gradient(135deg,var(--bg1),var(--bg2));
-  color:var(--text);overflow-x:hidden;
+  font-family:var(--font);min-height:100vh;
+  background:var(--bg);color:var(--text);overflow-x:hidden;
+  transition:background .3s,color .3s;
 }
-body[data-theme="neon"]{--bg1:#0a0010;--bg2:#0d0020}
-/* ── LIGHT MODE ── */
-body[data-theme=""]{
-  --bg1:#eef8ef;--bg2:#dff0e1;
-  --glass:rgba(255,255,255,0.78);
-  --glass-border:rgba(0,80,20,0.12);
-  --text:#0c1f10;--text2:rgba(12,31,16,0.58);
-  --accent:#2a9a50;--accent2:#1e7a3a;
+
+body[data-theme="dark"]{
+  --accent:#0a84ff;--accent2:#409cff;
 }
-body[data-theme=""] .app-tabs{
-  background:rgba(255,255,255,0.98)!important;
-  border-bottom-color:rgba(0,0,0,0.08)!important;
-}
-body[data-theme=""] .app-tab{color:rgba(20,60,25,0.40)!important}
-body[data-theme=""] .app-tab.active{color:var(--accent)!important}
-body[data-theme=""] .sub-tabs{
-  background:rgba(218,242,220,0.94)!important;
-  border-bottom-color:rgba(0,80,20,0.12)!important;
-}
-body[data-theme=""] .sub-tab{color:rgba(20,60,25,0.55)!important;border-color:rgba(0,80,20,0.15)!important;background:rgba(255,255,255,0.55)!important}
-body[data-theme=""] .sub-tab.active{color:#fff!important;background:linear-gradient(135deg,var(--accent),var(--accent2))!important;border-color:transparent!important}
+
 body[data-theme=""] .glass-card{
-  background:rgba(255,255,255,0.82)!important;
-  border-color:rgba(0,80,20,0.12)!important;
+  background:var(--surface)!important;
+  border:0.5px solid var(--sep)!important;
+  box-shadow:var(--shadow)!important;
 }
-body[data-theme=""] .result-box,.body[data-theme=""] .ball-result-display{
+body[data-theme=""] .result-box{
+  background:var(--surface2);border:0.5px solid var(--sep);
   color:var(--text);
 }
-body[data-theme=""] .section-title{color:rgba(12,31,16,0.50)!important}
+body[data-theme=""] .ball-range-inp,
+body[data-theme=""] .card-setting-inp{
+  background:var(--surface)!important;border:1px solid var(--sep)!important;color:var(--text)!important;
+}
 body[data-theme=""] .action-btn{
-  background:linear-gradient(135deg,#2a9a50,#1e7a3a)!important;
+  background:var(--accent)!important;box-shadow:0 4px 16px rgba(0,122,255,0.25)!important;
 }
-body[data-theme=""] .box3-top{background:linear-gradient(160deg,#3ab560,#2a9a50)!important;border-color:rgba(0,100,30,.5)!important}
-body[data-theme=""] .box3-front{background:linear-gradient(170deg,#3ab560,#2a9a50 45%,#1e7a3a 100%)!important;border-color:rgba(0,100,30,.4)!important}
-body[data-theme=""] .box3-right{background:linear-gradient(180deg,#1e7a3a,#0e4a22)!important;border-color:rgba(0,80,20,.3)!important}
-body[data-theme=""] .slot-cabinet{background:linear-gradient(160deg,#1e5a30,#0e3a1a)!important;border-color:rgba(0,120,40,.4)!important}
-
-/* ── APP TABS (shared — matches other pages) ── */
-.app-tabs{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  display:flex;height:var(--tab-h);align-items:center;
-  background:rgba(44,44,46,0.96);
-  backdrop-filter:saturate(180%) blur(40px);
-  -webkit-backdrop-filter:saturate(180%) blur(40px);
-  border-bottom:.5px solid rgba(255,255,255,0.10);
-}
-body[data-theme="neon"] .app-tabs{
-  background:rgba(44,44,46,0.96)!important;
-  border-bottom-color:rgba(255,255,255,0.10)!important;
-}
-.app-tab{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-decoration:none;color:rgba(255,255,255,0.38);gap:2px;
-  font-size:.55rem;font-weight:500;transition:color .15s;
-  -webkit-tap-highlight-color:transparent;
-}
-.app-tab .ti{font-size:1.35rem;line-height:1.1}
-.app-tab.active{color:var(--accent)}
-.app-tab:active{opacity:.6}
-.nav-theme{display:flex;align-items:center;gap:7px;padding:0 14px 0 4px;flex-shrink:0}
-.nav-t-dot{
-  width:17px;height:17px;border-radius:50%;cursor:pointer;
-  transition:transform .2s,box-shadow .2s;flex-shrink:0;
-  box-shadow:0 0 0 1.5px rgba(128,128,128,0.25);
-}
-.nav-t-dot:hover{transform:scale(1.15)}
-.nav-t-dot.active{transform:scale(1.18);box-shadow:0 0 0 2.5px rgba(255,255,255,0.9),0 0 0 1.5px rgba(0,0,0,0.2)}
-.td-light{background:linear-gradient(135deg,#f8f8f8,#d8d8de)}
-.td-dark{background:linear-gradient(135deg,#0a0818,#1e1e50)}
-
-/* ── SUB-TABS  (pill style matching lucky-draw mode buttons) ── */
-.sub-tabs{
-  position:fixed;top:var(--tab-h);left:0;right:0;z-index:150;
-  display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:nowrap;
-  background:rgba(10,5,30,0.75);backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  border-bottom:.5px solid rgba(255,255,255,0.1);
-  padding:10px 16px;
-  --sub-h:62px;height:var(--sub-h);
-  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-}
-.sub-tabs::-webkit-scrollbar{display:none}
-.sub-tab{
-  flex-shrink:0;border:1px solid var(--glass-border);
-  background:var(--glass);backdrop-filter:blur(10px);
-  color:var(--text2);font-family:inherit;font-size:.92rem;font-weight:500;
-  cursor:pointer;border-radius:40px;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  white-space:nowrap;padding:9px 22px;
-  transition:all .25s;-webkit-tap-highlight-color:transparent;
-}
-.sub-tab.active{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border-color:transparent;color:#fff;
-  box-shadow:0 4px 18px rgba(124,58,237,.45);
-  transform:translateY(-1px);
-}
-.sub-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.15)}
+body[data-theme=""] .hist-drawer{background:#fff;color:var(--text)}
+body[data-theme=""] .hist-item{background:#f2f2f7;border-color:var(--sep)}
+body[data-theme=""] .hist-result{color:var(--text)}
+body[data-theme=""] .hist-head-title{color:var(--text)}
 
 /* ── CONTENT AREA ── */
 .content{
-  padding-top:calc(var(--tab-h) + 48px + 16px);
+  padding-top:calc(var(--tab-h) + var(--sub-h) + 16px);
   padding-bottom:40px;
-  max-width:720px;margin:0 auto;
+  max-width:var(--content-max);margin:0 auto;
   padding-left:16px;padding-right:16px;
 }
 .tab-pane{display:none}
 .tab-pane.active{display:flex;flex-direction:column;gap:16px}
 
 /* ── SHARED CARD ── */
-.glass-card{
-  background:var(--glass);backdrop-filter:blur(20px);
-  border:1px solid var(--glass-border);border-radius:var(--radius);
-  padding:20px;
-}
-.section-title{font-size:.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.glass-card{padding:20px}
+.section-title{margin-bottom:10px}
 
 /* ── ACTION BUTTON ── */
 .action-btn{
-  width:100%;padding:16px;border:none;border-radius:16px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;font-family:inherit;font-size:1rem;font-weight:700;
-  cursor:pointer;transition:all .2s;box-shadow:0 6px 24px rgba(124,58,237,.4);
-  letter-spacing:.03em;
+  width:100%;padding:16px;border-radius:var(--radius-md);
+  letter-spacing:.02em;
 }
-.action-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(124,58,237,.5)}
+.action-btn:hover{transform:translateY(-1px)}
 .action-btn:active{transform:translateY(0) scale(.97)}
 .action-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
 /* ── RESULT BOX ── */
 .result-box{
   min-height:56px;border-radius:14px;
-  background:rgba(0,0,0,0.25);
+  background:var(--surface2);
+  border:0.5px solid var(--sep);
   display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;color:var(--text2);padding:10px;text-align:center;
+  font-size:var(--fs-base);color:var(--text2);padding:10px;text-align:center;
 }
 .result-box .res-big{
   font-size:clamp(1.6rem,6vw,2.4rem);font-weight:900;color:var(--text);
-  text-shadow:0 0 20px rgba(167,139,250,.6);
 }
 
 /* ══════════════════════════════════════
@@ -204,18 +117,22 @@ body[data-theme="neon"] .app-tabs{
 .face[data-val="6"] .pip:nth-child(6){grid-column:3;grid-row:3}
 .dice-controls{display:flex;align-items:center;gap:14px;justify-content:center}
 .dc-btn{
-  width:36px;height:36px;border-radius:50%;border:1px solid var(--glass-border);
-  background:var(--glass);color:var(--text);font-size:1.2rem;cursor:pointer;
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--sep);
+  background:var(--surface);color:var(--text);font-size:1.2rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .2s;
 }
-.dc-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+.dc-btn:hover{background:var(--surface2);transform:scale(1.06)}
 .dc-label{font-size:.9rem;font-weight:700;min-width:60px;text-align:center}
 
 /* ══════════════════════════════════════
    BALL MACHINE  – 3D box
 ══════════════════════════════════════ */
 /* Extra right+top padding so the 3D side faces don't get clipped */
-.ball-box-wrap{display:flex;justify-content:center;padding:44px 36px 8px 0}
+.ball-stage{
+  display:flex;align-items:center;justify-content:center;
+  gap:12px 24px;flex-wrap:wrap;
+}
+.ball-box-wrap{display:flex;justify-content:center;padding:44px 36px 8px 0;flex-shrink:0}
 /* Container – all 3 faces are children */
 .ball-box{
   position:relative;width:190px;height:145px;cursor:pointer;flex-shrink:0;
@@ -274,15 +191,19 @@ body[data-theme="neon"] .app-tabs{
   90%{transform:translate(-2px,0) rotate(-1deg)}
 }
 .ball-box.shaking{animation:boxShake 1.3s cubic-bezier(.36,.07,.19,.97) both}
-.ball-result-display{display:flex;align-items:center;justify-content:center;min-height:130px}
+.ball-result-display{
+  flex:1;min-width:120px;
+  display:flex;align-items:center;justify-content:center;
+  min-height:120px;padding:8px 0;
+}
 .ball-range-row{display:flex;align-items:center;gap:8px}
 .ball-range-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
 .ball-range-wrap label{font-size:.72rem;color:var(--text2);font-weight:600}
 .ball-range-sep{font-size:1.2rem;font-weight:700;color:var(--text2);flex-shrink:0;padding-top:16px}
 .ball-range-inp{
   width:100%;padding:8px 12px;border-radius:10px;
-  border:1px solid var(--glass-border);background:rgba(255,255,255,.1);
-  color:var(--text);font-family:inherit;font-size:1rem;font-weight:700;
+  border:1px solid var(--sep);background:var(--surface);
+  color:var(--text);font-family:var(--font);font-size:var(--fs-md);font-weight:var(--fw-semibold);
   text-align:center;outline:none;transition:all .2s;
   cursor:ns-resize;touch-action:none;
 }
@@ -296,10 +217,6 @@ body[data-theme="neon"] .app-tabs{
 }
 .ball-chip:hover{background:rgba(255,59,48,.4)}
 .ball-remaining{font-size:.72rem;color:var(--text2);text-align:center;margin-top:4px}
-.ball-result-display{
-  display:flex;align-items:center;justify-content:center;
-  min-height:90px;
-}
 .ball-result-num{
   width:120px;height:120px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -309,20 +226,7 @@ body[data-theme="neon"] .app-tabs{
   transform:scale(0);text-shadow:0 2px 8px rgba(0,0,0,.35);
 }
 .ball-result-num.show{transform:scale(1)}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.toggle-label{font-size:.82rem;color:var(--text2)}
-.toggle{
-  width:40px;height:22px;border-radius:11px;border:none;
-  background:rgba(255,255,255,.2);cursor:pointer;
-  position:relative;transition:background .2s;flex-shrink:0;
-}
-.toggle::after{
-  content:'';position:absolute;top:2px;left:2px;
-  width:18px;height:18px;border-radius:50%;background:#fff;
-  transition:transform .2s;
-}
-.toggle.on{background:var(--accent)}
-.toggle.on::after{transform:translateX(18px)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
 
 /* ══════════════════════════════════════
    PLAYING CARDS
@@ -366,7 +270,7 @@ body[data-theme="neon"] .app-tabs{
   display:flex;flex-direction:column;padding:5px;
   box-shadow:0 6px 20px rgba(0,0,0,.4);
   position:relative;
-  animation:cardDeal .35s cubic-bezier(.34,1.56,.64,1) both;
+  animation:cardDeal .35s cubic-bezier(.34,1.56,.64,1) forwards;
   flex-shrink:0;
 }
 .playing-card.red{color:#e00}
@@ -482,21 +386,23 @@ body[data-theme="neon"] .app-tabs{
 .hist-drawer{
   position:fixed;bottom:0;left:0;right:0;z-index:401;
   max-height:60vh;border-radius:24px 24px 0 0;
-  background:rgba(16,8,40,0.97);backdrop-filter:blur(24px);
-  border-top:1px solid rgba(167,139,250,.3);
+  background:var(--surface);backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:0.5px solid var(--sep);
+  color:var(--text);
   transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.2,.64,1);
   display:flex;flex-direction:column;
 }
 .hist-drawer.open{transform:translateY(0)}
 .hist-drag{
-  width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);
+  width:40px;height:4px;border-radius:2px;background:var(--text3);
   margin:10px auto 0;flex-shrink:0;cursor:grab;
 }
 .hist-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 20px 10px;flex-shrink:0;
 }
-.hist-head-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px}
+.hist-head-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--text)}
 .hist-head-actions{display:flex;align-items:center;gap:8px}
 .hist-clear-btn{
   padding:4px 12px;border-radius:20px;border:1px solid rgba(255,59,48,.4);
@@ -506,27 +412,46 @@ body[data-theme="neon"] .app-tabs{
 .hist-clear-btn:hover{background:rgba(255,59,48,.15)}
 .hist-close-btn{
   width:28px;height:28px;border-radius:50%;border:none;
-  background:rgba(255,255,255,.1);color:var(--text2);
+  background:var(--surface2);color:var(--text2);
   font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;
 }
-.hist-close-btn:hover{background:rgba(255,59,48,.3);color:#fff}
+.hist-close-btn:hover{background:rgba(255,59,48,.15);color:#FF6B6B}
 .hist-list{
   flex:1;overflow-y:auto;padding:0 16px 20px;
   display:flex;flex-direction:column;gap:7px;
 }
 .hist-list::-webkit-scrollbar{width:3px}
-.hist-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:2px}
+.hist-list::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px}
 .hist-item{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(255,255,255,.07);border-radius:11px;
-  padding:9px 12px;
+  display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;
+  background:var(--surface2);border-radius:11px;
+  padding:9px 12px;border:0.5px solid var(--sep);
 }
 .hist-seq{font-size:.65rem;font-weight:700;color:var(--accent);flex-shrink:0;min-width:1.8em;text-align:right;opacity:.8}
 .hist-mode{font-size:.9rem;flex-shrink:0}
-.hist-result{flex:1;font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hist-time{font-size:.65rem;color:var(--text2);flex-shrink:0}
+.hist-result{
+  flex:1;min-width:0;font-size:.82rem;font-weight:600;color:var(--text);
+  white-space:pre-line;word-break:break-word;overflow:visible;line-height:1.45;
+}
+.hist-time{font-size:.65rem;color:var(--text2);flex-shrink:0;margin-left:auto}
 .hist-empty{font-size:.82rem;color:var(--text2);text-align:center;padding:20px 0}
+.slot-excluded-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.slot-chips-wrap{display:flex;flex-wrap:wrap;gap:5px;max-height:72px;overflow-y:auto}
+.slot-chip{
+  padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700;
+  background:rgba(255,59,48,.15);color:#FF6B6B;cursor:pointer;
+}
+.slot-chip:hover{background:rgba(255,59,48,.3)}
+.card-draw-count{font-size:.9rem;font-weight:700;min-width:60px;text-align:center}
+.card-setting-inp{
+  padding:8px 10px;border-radius:10px;
+  border:1px solid var(--sep);background:var(--surface);
+  color:var(--text);font-family:var(--font);font-size:var(--fs-md);font-weight:var(--fw-semibold);
+  text-align:center;outline:none;width:80px;
+  cursor:ns-resize;touch-action:none;
+}
+.card-result-count{font-size:.78rem;color:var(--text2);text-align:center;margin-top:6px}
 </style>
 </head>
 <body>
@@ -541,7 +466,7 @@ body[data-theme="neon"] .app-tabs{
   <a href="todo.html" class="app-tab"><span class="ti">✅</span><span>待辦</span></a>
   <div class="nav-theme">
     <div class="nav-t-dot td-light" onclick="setTheme('')" title="淺色"></div>
-    <div class="nav-t-dot td-dark" onclick="setTheme('neon')" title="深色"></div>
+    <div class="nav-t-dot td-dark" onclick="setTheme('dark')" title="深色"></div>
   </div>
 </nav>
 
@@ -572,13 +497,18 @@ body[data-theme="neon"] .app-tabs{
   <!-- ══ BALL MACHINE ══ -->
   <div id="tabBalls" class="tab-pane">
     <div class="glass-card">
-      <div class="ball-box-wrap">
-        <div class="ball-box" id="ballBox">
-          <div class="box3-top"></div>
-          <div class="box3-right"></div>
-          <div class="box3-front">
-            <div class="box-icon">🎱</div>
+      <div class="ball-stage">
+        <div class="ball-box-wrap">
+          <div class="ball-box" id="ballBox">
+            <div class="box3-top"></div>
+            <div class="box3-right"></div>
+            <div class="box3-front">
+              <div class="box-icon">🎱</div>
+            </div>
           </div>
+        </div>
+        <div class="ball-result-display">
+          <div class="ball-result-num" id="ballResultNum">?</div>
         </div>
       </div>
     </div>
@@ -607,9 +537,6 @@ body[data-theme="neon"] .app-tabs{
         <button onclick="clearBallExcluded()" style="margin-top:8px;padding:5px 14px;border-radius:20px;border:1px solid var(--glass-border);background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;cursor:pointer">清除排除</button>
       </div>
     </div>
-    <div class="ball-result-display">
-      <div class="ball-result-num" id="ballResultNum">?</div>
-    </div>
     <button class="action-btn" id="ballBtn" onclick="drawBall()">🎱 開始抽！</button>
   </div>
 
@@ -627,18 +554,22 @@ body[data-theme="neon"] .app-tabs{
       </div>
       <div class="draw-row">
         <label>每副各抽</label>
-        <input type="number" class="card-setting-inp" id="cardDrawCount" value="5" min="1" max="52" style="width:80px" oninput="updateCardInfo()">
+        <div class="dice-controls" style="margin-top:0">
+          <button class="dc-btn" onclick="changeCardDraw(-1)">−</button>
+          <input type="number" class="card-setting-inp" id="cardDrawCount" value="5" min="1" max="52" oninput="updateCardInfo()">
+          <button class="dc-btn" onclick="changeCardDraw(1)">+</button>
+        </div>
         <span style="font-size:.82rem;color:var(--text2)">張</span>
       </div>
       <div class="card-deck-info" id="cardDeckInfo" style="margin-top:6px"></div>
     </div>
+    <button class="action-btn" id="cardBtn" onclick="dealCards()">🃏 發牌！</button>
     <div class="glass-card">
       <div class="section-title">抽出結果</div>
       <div id="cardsArea">
         <span class="card-hint">按下按鈕開始抽牌</span>
       </div>
     </div>
-    <button class="action-btn" id="cardBtn" onclick="dealCards()">🃏 發牌！</button>
   </div>
 
   <!-- ══ SLOT MACHINE ══ -->
@@ -656,6 +587,17 @@ body[data-theme="neon"] .app-tabs{
           <div class="slot-win-msg" id="slotWinMsg"></div>
         </div>
       </div>
+      <div style="margin-top:12px">
+        <div class="toggle-row">
+          <span class="toggle-label">抽中後排除</span>
+          <button class="toggle" id="slotAutoExcToggle" onclick="toggleSlotExclude()"></button>
+        </div>
+      </div>
+      <div class="slot-excluded-row">
+        <div class="slot-chips-wrap" id="slotChips"><span style="font-size:.72rem;color:var(--text2)">（無排除）</span></div>
+        <button onclick="clearSlotExcluded()" style="padding:5px 14px;border-radius:20px;border:1px solid var(--sep);background:transparent;color:var(--text2);font-family:inherit;font-size:.75rem;cursor:pointer">清除排除</button>
+      </div>
+      <div class="ball-remaining" id="slotRemaining" style="margin-top:6px"></div>
     </div>
     <button class="action-btn" id="slotBtn" onclick="spinSlot()">🎰 拉霸！</button>
   </div>
@@ -730,16 +672,16 @@ function toggleHistory(){
 
 // ── Theme ──
 function setTheme(t){
-  const isDark=(t==='neon'||t==='dark');
-  document.body.dataset.theme=isDark?'neon':'';
-  localStorage.setItem('app-theme',isDark?'neon':'');
+  const isDark=(t==='dark'||t==='neon');
+  document.body.dataset.theme=isDark?'dark':'';
+  localStorage.setItem('app-theme',isDark?'dark':'');
   document.querySelectorAll('.nav-t-dot').forEach(d=>d.classList.remove('active'));
   const dot=document.querySelector(isDark?'.td-dark':'.td-light');
   if(dot)dot.classList.add('active');
 }
 (function(){
   const t=localStorage.getItem('app-theme')||'';
-  setTheme(t);
+  setTheme(t==='neon'?'dark':t);
 })();
 
 // ── Sub-tab switch ──
@@ -753,6 +695,7 @@ function switchTab(t){
   document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');
   if(t==='balls'){updateBallRemaining();}
   if(t==='slots'&&!document.getElementById('reel0'))buildSlotReels();
+  if(t==='slots'){updateSlotRemaining();renderSlotChips();}
   if(t==='cards')updateCardInfo();
 }
 
@@ -974,6 +917,61 @@ function addSwipeSpin(el,onDelta,pxPerStep){
     updateBallRemaining();
   },4);
 });
+addSwipeSpin(document.getElementById('cardDrawCount'),d=>{
+  changeCardDraw(d);
+},4);
+
+// ══════════════════════════════════════
+// SLOT EXCLUDE
+// ══════════════════════════════════════
+let slotAutoExclude=false;
+let slotExcluded=[];
+
+function slotPoolSize(){
+  return Math.pow(10,slotDigitCount);
+}
+
+function updateSlotRemaining(){
+  const total=slotPoolSize();
+  const left=Math.max(0,total-slotExcluded.length);
+  const el=document.getElementById('slotRemaining');
+  if(el)el.textContent=`可抽：${left} / ${total} 組合`;
+}
+
+function toggleSlotExclude(){
+  slotAutoExclude=!slotAutoExclude;
+  document.getElementById('slotAutoExcToggle').classList.toggle('on',slotAutoExclude);
+}
+
+function clearSlotExcluded(){
+  slotExcluded=[];renderSlotChips();updateSlotRemaining();
+}
+
+function renderSlotChips(){
+  const el=document.getElementById('slotChips');
+  if(!slotExcluded.length){
+    el.innerHTML='<span style="font-size:.72rem;color:var(--text2)">（無排除）</span>';
+    return;
+  }
+  el.innerHTML=slotExcluded.map(s=>
+    `<span class="slot-chip" onclick="unexcludeSlot('${s}')">${s}</span>`).join('');
+}
+
+function unexcludeSlot(s){
+  slotExcluded=slotExcluded.filter(x=>x!==s);
+  renderSlotChips();updateSlotRemaining();
+}
+
+function pickSlotDigits(){
+  const total=slotPoolSize();
+  const maxAttempts=Math.min(total,5000);
+  for(let i=0;i<maxAttempts;i++){
+    const digits=Array.from({length:slotDigitCount},randDigit);
+    const key=digits.join('');
+    if(!slotAutoExclude||!slotExcluded.includes(key))return digits;
+  }
+  return null;
+}
 
 // ══════════════════════════════════════
 // PLAYING CARDS
@@ -1023,6 +1021,26 @@ function buildCardHTML(val,suitSym,isRed,animDelay){
 }
 
 let cardDeckCount=1;
+let cardDrawCount=5;
+
+function syncCardDraw(){
+  const inp=document.getElementById('cardDrawCount');
+  let v=parseInt(inp.value,10);
+  if(isNaN(v))v=cardDrawCount||5;
+  v=Math.max(1,Math.min(52,v));
+  cardDrawCount=v;
+  inp.value=v;
+  return v;
+}
+
+function changeCardDraw(d){
+  syncCardDraw();
+  const next=Math.max(1,Math.min(52,cardDrawCount+d));
+  if(next===cardDrawCount)return;
+  cardDrawCount=next;
+  document.getElementById('cardDrawCount').value=next;
+  updateCardInfo();
+}
 
 function buildDeck(){
   const deck=[];
@@ -1051,41 +1069,56 @@ function renderDeckStack(){
 }
 
 function updateCardInfo(){
-  const draw=Math.max(1,Math.min(52,parseInt(document.getElementById('cardDrawCount').value)||5));
+  const draw=syncCardDraw();
   document.getElementById('cardDeckInfo').textContent=
     `${cardDeckCount} 副 × ${draw} 張 = 共抽 ${cardDeckCount*draw} 張`;
 }
 
 function dealCards(){
-  const draw=Math.max(1,Math.min(52,parseInt(document.getElementById('cardDrawCount').value)||5));
+  const draw=syncCardDraw();
   document.getElementById('cardBtn').disabled=true;
   const area=document.getElementById('cardsArea');
   area.innerHTML='';
   const histParts=[];
+  let totalDealt=0;
   for(let d=0;d<cardDeckCount;d++){
     const deck=buildDeck();
+    if(deck.length<draw){
+      const err=document.createElement('div');
+      err.className='card-hint';
+      err.textContent=`第 ${d+1} 副牌不足（僅 ${deck.length} 張）`;
+      area.appendChild(err);
+      continue;
+    }
     shuffle(deck);
     const drawn=deck.slice(0,draw);
+    totalDealt+=drawn.length;
     const pile=document.createElement('div');
     pile.className='card-pile';
     if(cardDeckCount>1){
       const lbl=document.createElement('div');
       lbl.className='pile-label';
-      lbl.textContent=`第 ${d+1} 副`;
+      lbl.textContent=`#${d+1}（${drawn.length} 張）`;
       pile.appendChild(lbl);
     }
     const cardsWrap=document.createElement('div');
     cardsWrap.className='cards-area';
     cardsWrap.style.minHeight='0';
     cardsWrap.innerHTML=drawn.map((c,i)=>
-      buildCardHTML(c.val,c.suit.sym,c.suit.red,(d*draw+i)*0.06)
+      buildCardHTML(c.val,c.suit.sym,c.suit.red,Math.min(i,15)*0.03)
     ).join('');
     pile.appendChild(cardsWrap);
+    if(cardDeckCount===1){
+      const cnt=document.createElement('div');
+      cnt.className='card-result-count';
+      cnt.textContent=`共抽出 ${drawn.length} 張`;
+      pile.appendChild(cnt);
+    }
     area.appendChild(pile);
-    histParts.push(drawn.map(c=>c.val+c.suit.sym).join(' '));
+    histParts.push(`#${d+1} ${drawn.map(c=>c.val+c.suit.sym).join(' ')}`);
   }
   document.getElementById('cardBtn').disabled=false;
-  addHistory('🃏',histParts.join(' | '));
+  if(histParts.length)addHistory('🃏',histParts.join('\n'));
 }
 
 // ══════════════════════════════════════
@@ -1101,8 +1134,11 @@ function changeSlotDigits(d){
   const next=Math.max(1,Math.min(9,slotDigitCount+d));
   if(next===slotDigitCount)return;
   slotDigitCount=next;
+  slotExcluded=slotExcluded.filter(s=>s.length===slotDigitCount);
   document.getElementById('slotDigitDisp').textContent=slotDigitCount;
   buildSlotReels();
+  renderSlotChips();
+  updateSlotRemaining();
 }
 
 function buildSlotReels(){
@@ -1123,13 +1159,19 @@ function buildSlotReels(){
 
 function spinSlot(){
   if(slotSpinning)return;
+  const picked=pickSlotDigits();
+  if(!picked){
+    const msgEl=document.getElementById('slotWinMsg');
+    msgEl.textContent='可抽組合已用盡';
+    msgEl.classList.remove('spinning-txt');
+    return;
+  }
   slotSpinning=true;
   document.getElementById('slotBtn').disabled=true;
   const msgEl=document.getElementById('slotWinMsg');
   msgEl.textContent='';msgEl.classList.remove('spinning-txt');
 
-  const finalDigits=Array.from({length:slotDigitCount},randDigit);
-  // Stagger stop times: each reel stops 350ms after the previous
+  const finalDigits=picked;
   const stopTimes=finalDigits.map((_,i)=>700+i*350);
 
   for(let r=0;r<slotDigitCount;r++){
@@ -1161,10 +1203,16 @@ function resolveSlotResult(){
   slotSpinning=false;
   document.getElementById('slotBtn').disabled=false;
   const digits=slotResult.map(String);
+  const key=digits.join('');
   const msgEl=document.getElementById('slotWinMsg');
   msgEl.textContent=digits.join('  ');
   msgEl.classList.add('spinning-txt');
-  addHistory('🎰',digits.join(''));
+  if(slotAutoExclude&&!slotExcluded.includes(key)){
+    slotExcluded.push(key);
+    renderSlotChips();
+    updateSlotRemaining();
+  }
+  addHistory('🎰',key);
 }
 
 // ── Init ──
@@ -1173,6 +1221,8 @@ window.addEventListener('load',()=>{
   renderDeckStack();
   updateCardInfo();
   buildSlotReels();
+  syncCardDraw();
+  updateSlotRemaining();
 });
 </script>
 </body>
