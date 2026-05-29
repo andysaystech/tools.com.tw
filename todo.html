@@ -75,22 +75,21 @@ body[data-theme="dark"] .progress-track{background:rgba(255,255,255,0.12)}
 .progress-pct{font-size:0.85rem;font-weight:700;min-width:36px}
 
 /* QUICK ADD */
-.quick-add{display:flex;gap:10px;flex:1;min-width:280px;max-width:500px}
+.quick-add{display:flex;gap:8px;flex:1;min-width:0;max-width:500px;align-items:stretch}
 .quick-add input{
-  flex:1;padding:10px 16px;border-radius:12px;
+  flex:1;min-width:0;padding:10px 12px;border-radius:12px;
   border:1px solid var(--glass-border);background:rgba(255,255,255,0.12);
   color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;backdrop-filter:blur(10px);
 }
 .quick-add input:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.18)}
 .quick-add input::placeholder{color:var(--text2)}
 .quick-add select{
-  padding:10px 14px;border-radius:12px;
+  flex-shrink:0;max-width:42%;padding:10px 8px;border-radius:12px;
   border:1px solid var(--glass-border);background:rgba(255,255,255,0.12);
-  color:var(--text);font-family:inherit;font-size:0.85rem;outline:none;cursor:pointer;
+  color:var(--text);font-family:inherit;font-size:0.78rem;outline:none;cursor:pointer;
   backdrop-filter:blur(10px);
 }
 .quick-add select option{background:#333;color:#fff}
-.btn-add-task{padding:10px 20px;border-radius:12px;white-space:nowrap}
 .add-btn{
   width:36px;height:36px;border-radius:10px;border:none;cursor:pointer;
   background:var(--accent);color:#fff;font-size:1.2rem;
@@ -305,7 +304,7 @@ body[data-theme="dark"] .progress-track{background:rgba(255,255,255,0.12)}
       <option value="q3">🟡 緊急不重要</option>
       <option value="q4">⚪ 都不緊急</option>
     </select>
-    <button class="btn-add-task" onclick="quickAdd()">＋ 新增</button>
+    <button class="btn-add" onclick="quickAdd()">+</button>
   </div>
 </div>
 
