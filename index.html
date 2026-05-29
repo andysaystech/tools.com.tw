@@ -59,10 +59,11 @@ html,body{height:100%}
   flex:1;
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:clamp(6px,1.5vw,14px);
-  padding:0 clamp(8px,2vw,16px) clamp(8px,2vw,16px);
+  gap:clamp(10px,2vw,16px);
+  padding:0 clamp(12px,3vw,24px) clamp(12px,3vw,24px);
+  max-width:960px;margin:0 auto;width:100%;
 }
-@media(min-width:700px){.tools-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:520px){.tools-grid{grid-template-columns:repeat(3,1fr)}}
 
 /* ─── CARD ─── */
 .tool-card{
